@@ -17,11 +17,11 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import eu.neuhuber.autowallpaper.ui.SettingsScreen
 import eu.neuhuber.autowallpaper.ui.WallpaperUiEvent
 import eu.neuhuber.autowallpaper.ui.WallpaperViewModel
 import eu.neuhuber.autowallpaper.ui.theme.AutoWallpaperTheme
+import org.koin.androidx.compose.koinViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -29,7 +29,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             val context = LocalContext.current
-            val viewModel: WallpaperViewModel = viewModel()
+            val viewModel: WallpaperViewModel = koinViewModel()
 
             LaunchedEffect(key1 = true) {
                 lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -64,7 +64,7 @@ class MainActivity : ComponentActivity() {
                         SettingsScreen(
                             settings = viewModel.settings,
                             isLoading = viewModel.isUpdateInProgress,
-                            onSettingsChange = { viewModel.updateSettings(it, context) },
+                            onSettingsChange = { viewModel.updateSettings(it) },
                             onDownload = { viewModel.downloadImage() },
                             onSetNow = {
                                 viewModel.applyWallpaper(context)

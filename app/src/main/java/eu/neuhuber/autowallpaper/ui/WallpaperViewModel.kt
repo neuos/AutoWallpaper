@@ -1,7 +1,5 @@
 package eu.neuhuber.autowallpaper.ui
 
-import android.app.Application
-import android.app.WallpaperManager
 import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -9,20 +7,23 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.application
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.work.*
+import androidx.work.Constraints
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
 import eu.neuhuber.autowallpaper.data.BingImageProvider
 import eu.neuhuber.autowallpaper.data.SettingsRepository
 import eu.neuhuber.autowallpaper.model.WallpaperSettings
 import eu.neuhuber.autowallpaper.util.applyWallpaper
 import eu.neuhuber.autowallpaper.worker.WallpaperWorker
-import timber.log.Timber
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
 sealed class WallpaperUiEvent {
@@ -30,8 +31,10 @@ sealed class WallpaperUiEvent {
     data class Error(val message: String) : WallpaperUiEvent()
 }
 
-class WallpaperViewModel(application: Application) : AndroidViewModel(application) {
-    private val repository = SettingsRepository(application)
+class WallpaperViewModel(
+    private val repository: SettingsRepository,
+    private val workManager: WorkManager
+) : ViewModel() {
 
     var bitmap by mutableStateOf<ImageBitmap?>(null)
         private set
@@ -50,7 +53,7 @@ class WallpaperViewModel(application: Application) : AndroidViewModel(applicatio
             repository.settingsFlow.collectLatest {
                 Timber.d("New settings received from repository: $it")
                 settings = it
-                scheduleWallpaperWork(application)
+                scheduleWallpaperWork()
             }
         }
     }
@@ -61,9 +64,8 @@ class WallpaperViewModel(application: Application) : AndroidViewModel(applicatio
         }
     }
 
-    private fun scheduleWallpaperWork(context: Context) {
+    private fun scheduleWallpaperWork() {
         Timber.d("Scheduling periodic wallpaper work")
-        val workManager = WorkManager.getInstance(context)
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .setRequiresBatteryNotLow(true)
@@ -98,7 +100,7 @@ class WallpaperViewModel(application: Application) : AndroidViewModel(applicatio
         }
     }
 
-    fun applyWallpaper() {
+    fun applyWallpaper(context: Context) {
         val currentBitmap = bitmap?.asAndroidBitmap()
         if (currentBitmap == null) {
             Timber.w("Cannot apply wallpaper: bitmap is null")
@@ -108,8 +110,7 @@ class WallpaperViewModel(application: Application) : AndroidViewModel(applicatio
         viewModelScope.launch {
             isUpdateInProgress = true
             try {
-
-                applyWallpaper(application, currentBitmap, settings)
+                applyWallpaper(context, currentBitmap, settings)
                 Timber.d("Wallpaper applied successfully")
                 _eventChannel.send(WallpaperUiEvent.Success)
             } catch (e: Exception) {

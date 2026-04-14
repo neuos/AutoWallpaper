@@ -1,23 +1,22 @@
 package eu.neuhuber.autowallpaper.worker
 
-import android.app.WallpaperManager
 import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import eu.neuhuber.autowallpaper.data.BingImageProvider
 import eu.neuhuber.autowallpaper.data.SettingsRepository
 import eu.neuhuber.autowallpaper.util.applyWallpaper
-import timber.log.Timber
 import kotlinx.coroutines.flow.first
+import timber.log.Timber
 
 class WallpaperWorker(
     context: Context,
-    workerParams: WorkerParameters
+    workerParams: WorkerParameters,
+    private val repository: SettingsRepository
 ) : CoroutineWorker(context, workerParams) {
 
     override suspend fun doWork(): Result {
         return try {
-            val repository = SettingsRepository(applicationContext)
             val settings = repository.settingsFlow.first()
             val bitmap = BingImageProvider.getImage()
 

@@ -28,13 +28,13 @@ class SettingsRepository(private val context: Context) {
         .map { preferences ->
             val homescreen = try {
                 HomescreenMode.valueOf(preferences[PreferencesKeys.HOMESCREEN_MODE] ?: HomescreenMode.SCROLLING.name)
-            } catch (e: IllegalArgumentException) {
+            } catch (_: IllegalArgumentException) {
                 HomescreenMode.SCROLLING
             }
 
             val lockscreen = try {
                 LockscreenMode.valueOf(preferences[PreferencesKeys.LOCKSCREEN_MODE] ?: LockscreenMode.YES.name)
-            } catch (e: IllegalArgumentException) {
+            } catch (_: IllegalArgumentException) {
                 LockscreenMode.YES
             }
 
