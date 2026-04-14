@@ -8,6 +8,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import eu.neuhuber.autowallpaper.model.HomescreenMode
 import eu.neuhuber.autowallpaper.model.LockscreenMode
+import eu.neuhuber.autowallpaper.model.ScheduleMode
 import eu.neuhuber.autowallpaper.model.WallpaperSettings
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -38,11 +39,19 @@ class SettingsRepository(private val context: Context) {
                 LockscreenMode.YES
             }
 
+            val schedule = try {
+                ScheduleMode.valueOf(
+                    preferences[PreferencesKeys.SCHEDULE] ?: ScheduleMode.DAILY.name
+                )
+            } catch (_: IllegalArgumentException) {
+                ScheduleMode.DAILY
+            }
+
             WallpaperSettings(
                 homescreen = homescreen,
                 lockscreen = lockscreen,
                 provider = preferences[PreferencesKeys.PROVIDER] ?: "Bing",
-                schedule = preferences[PreferencesKeys.SCHEDULE] ?: "Daily"
+                schedule = schedule
             )
         }
 
@@ -52,7 +61,7 @@ class SettingsRepository(private val context: Context) {
             preferences[PreferencesKeys.HOMESCREEN_MODE] = settings.homescreen.name
             preferences[PreferencesKeys.LOCKSCREEN_MODE] = settings.lockscreen.name
             preferences[PreferencesKeys.PROVIDER] = settings.provider
-            preferences[PreferencesKeys.SCHEDULE] = settings.schedule
+            preferences[PreferencesKeys.SCHEDULE] = settings.schedule.name
         }
     }
 }

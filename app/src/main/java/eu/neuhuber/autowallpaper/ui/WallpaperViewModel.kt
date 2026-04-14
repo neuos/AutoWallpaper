@@ -14,8 +14,9 @@ import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
-import eu.neuhuber.autowallpaper.data.BingImageProvider
 import eu.neuhuber.autowallpaper.data.SettingsRepository
+import eu.neuhuber.autowallpaper.data.imageprovider.ImageProviderFactory
+import eu.neuhuber.autowallpaper.model.ScheduleMode
 import eu.neuhuber.autowallpaper.model.WallpaperSettings
 import eu.neuhuber.autowallpaper.util.applyWallpaper
 import eu.neuhuber.autowallpaper.worker.WallpaperWorker
@@ -33,7 +34,8 @@ sealed class WallpaperUiEvent {
 
 class WallpaperViewModel(
     private val repository: SettingsRepository,
-    private val workManager: WorkManager
+    private val workManager: WorkManager,
+    private val providerFactory: ImageProviderFactory
 ) : ViewModel() {
 
     var bitmap by mutableStateOf<ImageBitmap?>(null)
@@ -65,6 +67,12 @@ class WallpaperViewModel(
     }
 
     private fun scheduleWallpaperWork() {
+        if (settings.schedule == ScheduleMode.NONE) {
+            Timber.d("Schedule is OFF, canceling any existing work")
+            workManager.cancelUniqueWork("DailyWallpaperUpdate")
+            return
+        }
+
         Timber.d("Scheduling periodic wallpaper work")
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
@@ -84,16 +92,17 @@ class WallpaperViewModel(
 
     fun downloadImage() {
         if (isUpdateInProgress) return
-        Timber.d("Starting image download")
+        Timber.d("Starting image download from provider: ${settings.provider}")
         viewModelScope.launch {
             isUpdateInProgress = true
             try {
-                val image = BingImageProvider.getImage()
+                val provider = providerFactory.getProvider(settings.provider)
+                val image = provider.getImage()
                 bitmap = image.asImageBitmap()
-                Timber.d("Image downloaded successfully (${image.width}x${image.height} ${image.byteCount/1_000_000}MB)")
+                Timber.d("Image downloaded successfully from ${settings.provider} (${image.width}x${image.height} ${image.byteCount / 1_000_000}MB)")
             } catch (e: Exception) {
-                Timber.e(e, "Failed to download image")
-                _eventChannel.send(WallpaperUiEvent.Error("Failed to download image"))
+                Timber.e(e, "Failed to download image from ${settings.provider}")
+                _eventChannel.send(WallpaperUiEvent.Error("Failed to download image from ${settings.provider}"))
             } finally {
                 isUpdateInProgress = false
             }

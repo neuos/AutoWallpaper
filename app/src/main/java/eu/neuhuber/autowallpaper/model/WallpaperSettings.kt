@@ -11,9 +11,14 @@ enum class LockscreenMode(val label: String) {
     YES("Yes")
 }
 
+enum class ScheduleMode(val label: String) {
+    NONE("Off"),
+    DAILY("Daily")
+}
+
 data class WallpaperSettings(
     val homescreen: HomescreenMode = HomescreenMode.SCROLLING,
     val lockscreen: LockscreenMode = LockscreenMode.YES,
     val provider: String = "Bing",
-    val schedule: String = "Daily"
+    val schedule: ScheduleMode = ScheduleMode.DAILY
 )

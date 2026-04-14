@@ -27,6 +27,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import eu.neuhuber.autowallpaper.model.HomescreenMode
 import eu.neuhuber.autowallpaper.model.LockscreenMode
+import eu.neuhuber.autowallpaper.model.ScheduleMode
 import eu.neuhuber.autowallpaper.model.WallpaperSettings
 
 @Composable
@@ -94,8 +95,56 @@ fun SettingsScreen(
 
             HorizontalDivider()
 
-            Text("Schedule: ${settings.schedule}", style = MaterialTheme.typography.titleMedium)
-            Text("Provider: ${settings.provider}", style = MaterialTheme.typography.titleMedium)
+            val providers = listOf("Bing", "Picsum")
+            Text("Provider", style = MaterialTheme.typography.titleMedium)
+            Row(Modifier.selectableGroup()) {
+                providers.forEach { provider ->
+                    Row(
+                        Modifier
+                            .selectable(
+                                selected = (settings.provider == provider),
+                                onClick = { onSettingsChange(settings.copy(provider = provider)) },
+                                role = Role.RadioButton,
+                                enabled = !isLoading
+                            )
+                            .padding(horizontal = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        RadioButton(
+                            selected = (settings.provider == provider),
+                            onClick = null,
+                            enabled = !isLoading
+                        )
+                        Text(provider, Modifier.padding(start = 4.dp))
+                    }
+                }
+            }
+
+            HorizontalDivider()
+
+            Text("Schedule", style = MaterialTheme.typography.titleMedium)
+            Row(Modifier.selectableGroup()) {
+                ScheduleMode.entries.forEach { mode ->
+                    Row(
+                        Modifier
+                            .selectable(
+                                selected = (settings.schedule == mode),
+                                onClick = { onSettingsChange(settings.copy(schedule = mode)) },
+                                role = Role.RadioButton,
+                                enabled = !isLoading
+                            )
+                            .padding(horizontal = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        RadioButton(
+                            selected = (settings.schedule == mode),
+                            onClick = null,
+                            enabled = !isLoading
+                        )
+                        Text(mode.label, Modifier.padding(start = 4.dp))
+                    }
+                }
+            }
 
             Spacer(modifier = Modifier.height(16.dp))
 
