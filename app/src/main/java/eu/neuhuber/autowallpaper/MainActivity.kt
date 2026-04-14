@@ -49,7 +49,9 @@ class MainActivity : ComponentActivity() {
             AutoWallpaperTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     Box(
-                        modifier = Modifier.padding(innerPadding).fillMaxSize(),
+                        modifier = Modifier
+                            .padding(innerPadding)
+                            .fillMaxSize(),
                         contentAlignment = Alignment.BottomCenter
                     ) {
                         viewModel.bitmap?.let {
@@ -64,6 +66,7 @@ class MainActivity : ComponentActivity() {
                         SettingsScreen(
                             settings = viewModel.settings,
                             isLoading = viewModel.isUpdateInProgress,
+                            isSetNowEnabled = viewModel.bitmap != null,
                             onSettingsChange = { viewModel.updateSettings(it) },
                             onDownload = { viewModel.downloadImage() },
                             onSetNow = {

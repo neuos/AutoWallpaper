@@ -10,20 +10,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.selection.selectable
-import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.RadioButton
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import eu.neuhuber.autowallpaper.model.HomescreenMode
 import eu.neuhuber.autowallpaper.model.LockscreenMode
@@ -37,6 +34,7 @@ fun SettingsScreen(
     onSettingsChange: (WallpaperSettings) -> Unit,
     onDownload: () -> Unit,
     onSetNow: () -> Unit,
+    isSetNowEnabled: Boolean,
     modifier: Modifier = Modifier,
 ) {
     Card(
@@ -45,115 +43,93 @@ fun SettingsScreen(
             .fillMaxWidth()
             .wrapContentHeight()
             .statusBarsPadding(),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f))
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface.copy(
+                alpha = 0.9f
+            )
+        )
     ) {
         Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Text("Homescreen", style = MaterialTheme.typography.titleMedium)
-            Row(Modifier.selectableGroup()) {
-                HomescreenMode.entries.forEach { mode ->
-                    Row(
-                        Modifier
-                            .selectable(
-                                selected = (settings.homescreen == mode),
-                                onClick = { onSettingsChange(settings.copy(homescreen = mode)) },
-                                role = Role.RadioButton,
-                                enabled = !isLoading
-                            )
-                            .padding(horizontal = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        RadioButton(selected = (settings.homescreen == mode), onClick = null, enabled = !isLoading)
-                        Text(mode.label, Modifier.padding(start = 4.dp))
-                    }
+            Text("Homescreen", style = MaterialTheme.typography.labelLarge)
+            SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
+                HomescreenMode.entries.forEachIndexed { index, mode ->
+                    SegmentedButton(
+                        shape = SegmentedButtonDefaults.itemShape(
+                            index = index, count = HomescreenMode.entries.size
+                        ),
+                        onClick = { onSettingsChange(settings.copy(homescreen = mode)) },
+                        selected = settings.homescreen == mode,
+                        label = { Text(mode.label) },
+                        enabled = !isLoading
+                    )
                 }
             }
 
-            HorizontalDivider()
 
-            Text("Lockscreen", style = MaterialTheme.typography.titleMedium)
-            Row(Modifier.selectableGroup()) {
-                LockscreenMode.entries.forEach { mode ->
-                    Row(
-                        Modifier
-                            .selectable(
-                                selected = (settings.lockscreen == mode),
-                                onClick = { onSettingsChange(settings.copy(lockscreen = mode)) },
-                                role = Role.RadioButton,
-                                enabled = !isLoading
-                            )
-                            .padding(horizontal = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        RadioButton(selected = (settings.lockscreen == mode), onClick = null, enabled = !isLoading)
-                        Text(mode.label, Modifier.padding(start = 4.dp))
-                    }
+            Text("Lockscreen", style = MaterialTheme.typography.labelLarge)
+            SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
+                LockscreenMode.entries.forEachIndexed { index, mode ->
+                    SegmentedButton(
+                        shape = SegmentedButtonDefaults.itemShape(
+                            index = index, count = LockscreenMode.entries.size
+                        ),
+                        onClick = { onSettingsChange(settings.copy(lockscreen = mode)) },
+                        selected = settings.lockscreen == mode,
+                        label = { Text(mode.label) },
+                        enabled = !isLoading
+                    )
                 }
             }
 
-            HorizontalDivider()
 
             val providers = listOf("Bing", "Picsum")
-            Text("Provider", style = MaterialTheme.typography.titleMedium)
-            Row(Modifier.selectableGroup()) {
-                providers.forEach { provider ->
-                    Row(
-                        Modifier
-                            .selectable(
-                                selected = (settings.provider == provider),
-                                onClick = { onSettingsChange(settings.copy(provider = provider)) },
-                                role = Role.RadioButton,
-                                enabled = !isLoading
-                            )
-                            .padding(horizontal = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        RadioButton(
-                            selected = (settings.provider == provider),
-                            onClick = null,
-                            enabled = !isLoading
-                        )
-                        Text(provider, Modifier.padding(start = 4.dp))
-                    }
+            Text("Provider", style = MaterialTheme.typography.labelLarge)
+            SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
+                providers.forEachIndexed { index, provider ->
+                    SegmentedButton(
+                        shape = SegmentedButtonDefaults.itemShape(
+                            index = index, count = providers.size
+                        ),
+                        onClick = { onSettingsChange(settings.copy(provider = provider)) },
+                        selected = settings.provider == provider,
+                        label = { Text(provider) },
+                        enabled = !isLoading
+                    )
                 }
             }
 
-            HorizontalDivider()
 
-            Text("Schedule", style = MaterialTheme.typography.titleMedium)
-            Row(Modifier.selectableGroup()) {
-                ScheduleMode.entries.forEach { mode ->
-                    Row(
-                        Modifier
-                            .selectable(
-                                selected = (settings.schedule == mode),
-                                onClick = { onSettingsChange(settings.copy(schedule = mode)) },
-                                role = Role.RadioButton,
-                                enabled = !isLoading
-                            )
-                            .padding(horizontal = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        RadioButton(
-                            selected = (settings.schedule == mode),
-                            onClick = null,
-                            enabled = !isLoading
-                        )
-                        Text(mode.label, Modifier.padding(start = 4.dp))
-                    }
+            Text("Schedule", style = MaterialTheme.typography.labelLarge)
+            SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
+                ScheduleMode.entries.forEachIndexed { index, mode ->
+                    SegmentedButton(
+                        shape = SegmentedButtonDefaults.itemShape(
+                            index = index, count = ScheduleMode.entries.size
+                        ),
+                        onClick = { onSettingsChange(settings.copy(schedule = mode)) },
+                        selected = settings.schedule == mode,
+                        label = { Text(mode.label) },
+                        enabled = !isLoading
+                    )
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Button(onClick = onDownload, modifier = Modifier.weight(1f), enabled = !isLoading) {
-                    if (isLoading) CircularProgressIndicator(modifier = Modifier.size(18.dp), strokeWidth = 2.dp)
+                    if (isLoading) CircularProgressIndicator(
+                        modifier = Modifier.size(18.dp), strokeWidth = 2.dp
+                    )
                     else Text("Download")
                 }
-                Button(onClick = onSetNow, modifier = Modifier.weight(1f), enabled = !isLoading) {
+                Button(
+                    onClick = onSetNow,
+                    modifier = Modifier.weight(1f),
+                    enabled = !isLoading && isSetNowEnabled
+                ) {
                     Text("Set Now")
                 }
             }
