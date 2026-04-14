@@ -10,7 +10,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
-suspend fun applyWallpaper(context: Context, manager: WallpaperManager, bitmap: Bitmap, settings: WallpaperSettings) {
+suspend fun applyWallpaper(context: Context, bitmap: Bitmap, settings: WallpaperSettings) {
+    val manager = WallpaperManager.getInstance(context)
     if (settings.homescreen != HomescreenMode.NONE) {
         val ratio = if (settings.homescreen == HomescreenMode.SCROLLING) {
             manager.desiredMinimumWidth.toFloat() / manager.desiredMinimumHeight

@@ -5,9 +5,10 @@ import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import eu.neuhuber.autowallpaper.data.BingImageProvider
-import eu.neuhuber.autowallpaper.model.WallpaperSettings
+import eu.neuhuber.autowallpaper.data.SettingsRepository
 import eu.neuhuber.autowallpaper.util.applyWallpaper
 import timber.log.Timber
+import kotlinx.coroutines.flow.first
 
 class WallpaperWorker(
     context: Context,
@@ -16,13 +17,11 @@ class WallpaperWorker(
 
     override suspend fun doWork(): Result {
         return try {
+            val repository = SettingsRepository(applicationContext)
+            val settings = repository.settingsFlow.first()
             val bitmap = BingImageProvider.getImage()
-            val wallpaperManager = WallpaperManager.getInstance(applicationContext)
-            
-            // For now, use default settings. In a real app, these would be loaded from DataStore/SharedPreferences.
-            val settings = WallpaperSettings() 
-            
-            applyWallpaper(applicationContext, wallpaperManager, bitmap, settings)
+
+            applyWallpaper(applicationContext, bitmap, settings)
             Timber.d("Wallpaper updated successfully")
             Result.success()
         } catch (e: Exception) {
