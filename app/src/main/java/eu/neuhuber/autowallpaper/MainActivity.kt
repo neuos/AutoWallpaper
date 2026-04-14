@@ -46,7 +46,7 @@ class MainActivity : ComponentActivity() {
                 }
             }
 
-            AutoWallpaperTheme {
+            AutoWallpaperTheme(imageBitmap = viewModel.bitmap) {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     Box(
                         modifier = Modifier

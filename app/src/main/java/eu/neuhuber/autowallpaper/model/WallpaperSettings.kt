@@ -17,7 +17,7 @@ enum class ScheduleMode(val label: String) {
 }
 
 data class WallpaperSettings(
-    val homescreen: HomescreenMode = HomescreenMode.SCROLLING,
+    val homescreen: HomescreenMode = HomescreenMode.STATIC,
     val lockscreen: LockscreenMode = LockscreenMode.YES,
     val provider: String = "Bing",
     val schedule: ScheduleMode = ScheduleMode.DAILY

@@ -3,6 +3,7 @@ package eu.neuhuber.autowallpaper.util
 import android.app.WallpaperManager
 import android.content.Context
 import android.graphics.Bitmap
+import androidx.palette.graphics.Palette
 import eu.neuhuber.autowallpaper.model.HomescreenMode
 import eu.neuhuber.autowallpaper.model.LockscreenMode
 import eu.neuhuber.autowallpaper.model.WallpaperSettings
@@ -61,3 +62,8 @@ suspend fun Bitmap.centerCrop(aspectRatio: Float): Bitmap =
         val yOffset = (origHeight - cropHeight) / 2
         Bitmap.createBitmap(this@centerCrop, xOffset, yOffset, cropWidth, cropHeight)
     }
+
+fun extractSeedColor(bitmap: Bitmap): Int {
+    val palette = Palette.from(bitmap).generate()
+    return palette.getDominantColor(0)
+}

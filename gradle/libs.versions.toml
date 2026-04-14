@@ -14,8 +14,12 @@ activityCompose = "1.13.0"
 kotlin = "2.3.20"
 composeBom = "2026.03.01"
 composeLintChecks = "1.4.2"
+palette = "1.0.0"
+material-kolor = "4.1.1"
 
 [libraries]
+material-kolor = { group = "com.materialkolor", name = "material-kolor", version.ref = "material-kolor" }
+androidx-palette = { group = "androidx.palette", name = "palette-ktx", version.ref = "palette" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
@@ -42,4 +46,3 @@ compose-lint-checks = { group = "com.slack.lint.compose", name = "compose-lint-c
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
-
