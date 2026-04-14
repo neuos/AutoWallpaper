@@ -7,6 +7,7 @@ import androidx.work.WorkerParameters
 import eu.neuhuber.autowallpaper.data.BingImageProvider
 import eu.neuhuber.autowallpaper.model.WallpaperSettings
 import eu.neuhuber.autowallpaper.util.applyWallpaper
+import timber.log.Timber
 
 class WallpaperWorker(
     context: Context,
@@ -22,9 +23,10 @@ class WallpaperWorker(
             val settings = WallpaperSettings() 
             
             applyWallpaper(applicationContext, wallpaperManager, bitmap, settings)
+            Timber.d("Wallpaper updated successfully")
             Result.success()
         } catch (e: Exception) {
-            e.printStackTrace()
+            Timber.e(e, "Error updating wallpaper")
             Result.retry()
         }
     }

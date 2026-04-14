@@ -8,6 +8,7 @@ import eu.neuhuber.autowallpaper.model.LockscreenMode
 import eu.neuhuber.autowallpaper.model.WallpaperSettings
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 suspend fun applyWallpaper(context: Context, manager: WallpaperManager, bitmap: Bitmap, settings: WallpaperSettings) {
     if (settings.homescreen != HomescreenMode.NONE) {
@@ -27,14 +28,19 @@ suspend fun applyWallpaper(context: Context, manager: WallpaperManager, bitmap: 
 }
 
 suspend fun setWallpaper(manager: WallpaperManager, image: Bitmap, which: Int, aspectRatio: Float) {
-    if (!manager.isSetWallpaperAllowed) return
+    if (!manager.isSetWallpaperAllowed) {
+        Timber.w("Wallpaper set not allowed")
+        return
+    }
     try {
+        Timber.d("Cropping bitmap for $which with aspect ratio $aspectRatio")
         val cropped = image.centerCrop(aspectRatio)
         withContext(Dispatchers.IO) {
+            Timber.d("Setting bitmap for $which")
             manager.setBitmap(cropped, null, true, which)
         }
     } catch (e: Exception) {
-        e.printStackTrace()
+        Timber.e(e, "Failed to set wallpaper for $which")
     }
 }
 

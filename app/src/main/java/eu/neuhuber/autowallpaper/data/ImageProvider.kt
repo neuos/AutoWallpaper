@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import java.net.URL
 
 interface ImageProvider {
@@ -17,11 +18,10 @@ object BingImageProvider : ImageProvider {
         return withContext(Dispatchers.IO) {
             try {
                 val connection = url.openConnection()
-                connection.setRequestProperty("User-Agent", "Mozilla/5.0")
                 val response = connection.getInputStream()
                 BitmapFactory.decodeStream(response) ?: throw Exception("Failed to decode image")
             } catch (e: Exception) {
-                e.printStackTrace()
+                Timber.e(e, "Error fetching image from Bing")
                 throw e
             }
         }
