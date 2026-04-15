@@ -16,8 +16,10 @@ composeBom = "2026.03.01"
 composeLintChecks = "1.4.2"
 palette = "1.0.0"
 material-kolor = "4.1.1"
+core-splashscreen = "1.2.0"
 
 [libraries]
+androidx-core-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "core-splashscreen" }
 material-kolor = { group = "com.materialkolor", name = "material-kolor", version.ref = "material-kolor" }
 androidx-palette = { group = "androidx.palette", name = "palette-ktx", version.ref = "palette" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
