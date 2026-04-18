@@ -10,7 +10,7 @@ android {
 
     // version number
     // 1. Manually controlled main version
-    val majorVersion = 1
+    val majorVersion = 2
     val minorVersion = project.findProperty("minorVersion")?.toString() ?: "0"
     val patchVersion = project.findProperty("patchVersion")?.toString() ?: "0"
 

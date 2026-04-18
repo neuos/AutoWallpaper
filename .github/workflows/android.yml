@@ -120,9 +120,9 @@ jobs:
           MAJOR_VERSION=$(grep "val majorVersion =" app/build.gradle.kts | awk -F'=' '{print $2}' | xargs)
           LAST_MAJOR_CHANGE=$(git log -G "val majorVersion =" -n 1 --pretty=format:%H -- app/build.gradle.kts)
           if [ -z "$LAST_MAJOR_CHANGE" ]; then
-            MINOR_VERSION=$(git rev-list --count HEAD)
+            MINOR_VERSION=$(git rev-list --count --merges HEAD)
           else
-            MINOR_VERSION=$(git rev-list --count ${LAST_MAJOR_CHANGE}..HEAD)
+            MINOR_VERSION=$(git rev-list --count --merges ${LAST_MAJOR_CHANGE}..HEAD)
           fi
           PATCH_VERSION=${{ github.run_number }}
           echo "major=$MAJOR_VERSION" >> $GITHUB_OUTPUT
