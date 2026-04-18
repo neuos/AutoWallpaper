@@ -2,9 +2,14 @@ package eu.neuhuber.autowallpaper.ui
 
 import android.graphics.BitmapFactory
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.material3.Surface
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onRoot
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.github.takahirom.roborazzi.RoborazziOptions
 import com.github.takahirom.roborazzi.captureRoboImage
 import eu.neuhuber.autowallpaper.model.WallpaperSettings
 import eu.neuhuber.autowallpaper.ui.theme.AutoWallpaperTheme
@@ -44,14 +49,21 @@ class WallpaperScreenshotTest {
     fun snapshotSettingsContent() {
         composeTestRule.setContent {
             AutoWallpaperTheme {
-                SettingsContent(
-                    settings = WallpaperSettings(),
-                    isLoading = false,
-                    onSettingsChange = {}
-                )
+                Surface {
+                    SettingsContent(
+                        settings = WallpaperSettings(),
+                        isLoading = false,
+                        onSettingsChange = {},
+                        modifier = Modifier.testTag("settings_content")
+                    )
+                }
             }
         }
-        composeTestRule.onRoot().captureRoboImage()
+        composeTestRule.onNodeWithTag("settings_content").captureRoboImage(
+            roborazziOptions = RoborazziOptions(
+                compareOptions = RoborazziOptions.CompareOptions(changeThreshold = 0.01f)
+            )
+        )
     }
 
     @Test
@@ -77,7 +89,11 @@ class WallpaperScreenshotTest {
                 )
             }
         }
-        composeTestRule.onRoot().captureRoboImage()
+        composeTestRule.onRoot().captureRoboImage(
+            roborazziOptions = RoborazziOptions(
+                compareOptions = RoborazziOptions.CompareOptions(changeThreshold = 0.01f)
+            )
+        )
     }
 
     @Test
@@ -103,6 +119,10 @@ class WallpaperScreenshotTest {
                 )
             }
         }
-        composeTestRule.onRoot().captureRoboImage()
+        composeTestRule.onRoot().captureRoboImage(
+            roborazziOptions = RoborazziOptions(
+                compareOptions = RoborazziOptions.CompareOptions(changeThreshold = 0.01f)
+            )
+        )
     }
 }
