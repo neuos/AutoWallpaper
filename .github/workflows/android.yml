@@ -47,11 +47,13 @@ jobs:
           reporter: java-junit
 
       - name: Upload Screenshot Comparison Report
-        if: failure()
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: roborazzi-report
-          path: app/build/reports/roborazzi/
+          path: |
+            app/build/reports/roborazzi/
+            app/build/outputs/roborazzi/
 
       - name: Upload Lint Report
         if: always()
