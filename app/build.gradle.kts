@@ -7,20 +7,43 @@ android {
     namespace = "eu.neuhuber.autowallpaper"
     compileSdk = 37
 
+    // version number
+    // 1. Manually controlled main version
+    val majorVersion = 1
+    val minorVersion = project.findProperty("minorVersion")?.toString() ?: "0"
+    val patchVersion = project.findProperty("patchVersion")?.toString() ?: "0"
+
     defaultConfig {
         applicationId = "eu.neuhuber.autowallpaper"
         minSdk = 24
         targetSdk = 37
-        versionCode = 1
-        versionName = "1.0"
+
+        versionCode = patchVersion.toInt()
+        versionName = "$majorVersion.$minorVersion.$patchVersion"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        setProperty("archivesBaseName", "AutoWallpaper")
+    }
+
+    flavorDimensions += "version"
+    productFlavors {
+        create("standard") {
+            dimension = "version"
+        }
     }
 
     buildTypes {
+        val releaseSigningConfig = signingConfigs.create("release") {
+            storeFile = file(System.getenv("KEYSTORE_PATH") ?: "release.jks")
+            storePassword = System.getenv("KEYSTORE_PASSWORD")
+            keyAlias = System.getenv("KEY_ALIAS")
+            keyPassword = System.getenv("KEY_PASSWORD")
+        }
+
         release {
             isMinifyEnabled = true
             isShrinkResources = true
+            signingConfig = releaseSigningConfig
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"

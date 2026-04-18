@@ -134,7 +134,7 @@ fun ActionButtons(
                     modifier = Modifier.size(18.dp),
                     strokeWidth = 2.dp
                 )
-                else Text("Download")
+                else Text("Preview")
             }
             Button(
                 onClick = onSetNow,
