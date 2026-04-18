@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
     <shortcut
-        android:shortcutId="refresh_wallpaper"
         android:enabled="true"
         android:icon="@drawable/ic_refresh"
+        android:shortcutId="refresh_wallpaper"
+        android:shortcutLongLabel="@string/shortcut_refresh_long_label"
         android:shortcutShortLabel="@string/shortcut_refresh_label"
-        android:shortcutLongLabel="@string/shortcut_refresh_long_label">
+        tools:targetApi="25">
         <intent
             android:action="eu.neuhuber.autowallpaper.ACTION_REFRESH_WALLPAPER"
-            android:targetPackage="eu.neuhuber.autowallpaper"
-            android:targetClass="eu.neuhuber.autowallpaper.MainActivity" />
+            android:targetClass="eu.neuhuber.autowallpaper.MainActivity"
+            android:targetPackage="eu.neuhuber.autowallpaper" />
     </shortcut>
 </shortcuts>
