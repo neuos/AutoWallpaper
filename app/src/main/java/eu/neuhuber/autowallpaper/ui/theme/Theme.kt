@@ -14,7 +14,7 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.platform.LocalContext
 import com.materialkolor.rememberDynamicColorScheme
-import eu.neuhuber.autowallpaper.util.extractSeedColor
+import eu.neuhuber.autowallpaper.data.WallpaperService
 
 private val DarkColorSchemeFallback = darkColorScheme(
     primary = Purple80,
@@ -39,7 +39,7 @@ fun AutoWallpaperTheme(
 
     val seedColor = remember(imageBitmap) {
         imageBitmap?.let {
-            val argb = extractSeedColor(it.asAndroidBitmap())
+            val argb = WallpaperService.extractSeedColor(it.asAndroidBitmap())
             Color(argb)
         }
     }

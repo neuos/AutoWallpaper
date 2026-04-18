@@ -114,11 +114,6 @@ class WallpaperService(
             Bitmap.createBitmap(image, xOffset, yOffset, cropWidth, cropHeight)
         }
 
-    fun extractSeedColor(bitmap: Bitmap): Int {
-        val palette = Palette.from(bitmap).generate()
-        return palette.getDominantColor(0)
-    }
-
     /**
      * Scheduling: Manage WorkManager.
      */
@@ -164,5 +159,12 @@ class WallpaperService(
             ExistingWorkPolicy.REPLACE,
             workRequest
         )
+    }
+
+    companion object {
+        fun extractSeedColor(bitmap: Bitmap): Int {
+            val palette = Palette.from(bitmap).generate()
+            return palette.getDominantColor(0)
+        }
     }
 }
