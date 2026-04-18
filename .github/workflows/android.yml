@@ -5,12 +5,18 @@ on:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
+  workflow_dispatch:
+    inputs:
+      update_screenshots:
+        description: 'Update Roborazzi baselines'
+        required: false
+        default: 'false'
 
 jobs:
   debug:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
       checks: write
     steps:
       - uses: actions/checkout@v4
@@ -30,7 +36,21 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build, Test and Lint
-        run: ./gradlew :app:assembleDebug :app:testDebugUnitTest :app:verifyRoborazziDebug :app:lintDebug --no-daemon
+        run: |
+          if [ "${{ github.event.inputs.update_screenshots }}" == "true" ]; then
+            ./gradlew :app:assembleDebug :app:testDebugUnitTest :app:recordRoborazziDebug :app:lintDebug --no-daemon
+          else
+            ./gradlew :app:assembleDebug :app:testDebugUnitTest :app:verifyRoborazziDebug :app:lintDebug --no-daemon
+          fi
+
+      - name: Commit Updated Screenshots
+        if: github.event.inputs.update_screenshots == 'true'
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add app/src/test/screenshots/*.png
+          git commit -m "Update Roborazzi screenshots from CI"
+          git push
 
       - name: Lint Report
         uses: hidakatsuya/action-report-android-lint@v1
