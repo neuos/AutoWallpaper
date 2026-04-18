@@ -9,6 +9,9 @@ on:
 jobs:
   debug:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      checks: write
     steps:
       - uses: actions/checkout@v4
 
@@ -29,6 +32,20 @@ jobs:
       - name: Build, Test and Lint
         run: ./gradlew :app:assembleDebug :app:testDebugUnitTest :app:verifyRoborazziDebug :app:lintDebug --no-daemon
 
+      - name: Lint Report
+        uses: hidakatsuya/action-report-android-lint@v1
+        if: always()
+        with:
+          report-path: app/build/reports/lint-results-debug.xml
+
+      - name: Test Report
+        uses: dorny/test-reporter@v1
+        if: always()
+        with:
+          name: Unit Tests (Debug)
+          path: 'app/build/test-results/testDebugUnitTest/*.xml'
+          reporter: java-junit
+
       - name: Upload Screenshot Comparison Report
         if: failure()
         uses: actions/upload-artifact@v4
@@ -47,6 +64,9 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs: [ debug ]
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      checks: write
     steps:
       - uses: actions/checkout@v4
         with:
@@ -93,6 +113,12 @@ jobs:
             -PminorVersion=${{ steps.versioning.outputs.minor }} \
             -PpatchVersion=${{ steps.versioning.outputs.patch }} \
             --no-daemon
+
+      - name: Lint Report
+        uses: hidakatsuya/action-report-android-lint@v1
+        if: always()
+        with:
+          report-path: app/build/reports/lint-results-release.xml
 
       - name: Upload Lint Report
         if: always()
