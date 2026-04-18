@@ -5,17 +5,22 @@
 
 An Android application that automatically updates your wallpaper.
 
-## Screenshots
-
-|                                                     Main Screen                                                      |                                                               Settings                                                               |
-|:--------------------------------------------------------------------------------------------------------------------:|:------------------------------------------------------------------------------------------------------------------------------------:|
-| ![Main Screen](app/src/test/screenshots/eu.neuhuber.autowallpaper.ui.WallpaperScreenshotTest.snapshotMainScreen.png) | ![Settings Screen](app/src/test/screenshots/eu.neuhuber.autowallpaper.ui.WallpaperScreenshotTest.snapshotMainScreenWithSettings.png) |
-
 ## Features
 
 - **Automated Updates**: Change your wallpaper daily or hourly.
 - **Multiple Sources**: Support for Bing Wallpaper of the Day and Picsum Photos.
 - **Material 3 UI**: Built with Jetpack Compose and modern Material Design principles.
+
+## Screenshots
+
+<details>
+<summary>Show Screenshots</summary>
+
+|                                                     Main Screen                                                      |                                                               Settings                                                               |
+|:--------------------------------------------------------------------------------------------------------------------:|:------------------------------------------------------------------------------------------------------------------------------------:|
+| ![Main Screen](app/src/test/screenshots/eu.neuhuber.autowallpaper.ui.WallpaperScreenshotTest.snapshotMainScreen.png) | ![Settings Screen](app/src/test/screenshots/eu.neuhuber.autowallpaper.ui.WallpaperScreenshotTest.snapshotMainScreenWithSettings.png) |
+
+</details>
 
 ## Technical Stack
 
