@@ -4,6 +4,8 @@
 
 An Android application that automatically updates your wallpaper.
 
+[**Download Latest APK**](https://github.com/neuos/AutoWallpaper/actions/workflows/android.yml?query=is%3Asuccess+branch%3Amain)
+
 ## Screenshots
 
 |                                                     Main Screen                                                      |                                                               Settings                                                               |
