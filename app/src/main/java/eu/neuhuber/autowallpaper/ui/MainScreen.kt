@@ -32,9 +32,7 @@ fun MainScreen(
 
     Scaffold(modifier = modifier.fillMaxSize()) { innerPadding ->
         Box(
-            modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxSize(),
+            modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.BottomCenter
         ) {
             state.bitmap?.let {
@@ -47,6 +45,7 @@ fun MainScreen(
             }
 
             ActionButtons(
+                modifier = Modifier.padding(innerPadding),
                 isLoading = state.isUpdateInProgress,
                 isSetNowEnabled = state.bitmap != null,
                 onDownload = onDownload,
