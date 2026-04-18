@@ -1,7 +1,7 @@
 package eu.neuhuber.autowallpaper.ui
 
-import androidx.work.WorkManager
 import eu.neuhuber.autowallpaper.data.SettingsRepository
+import eu.neuhuber.autowallpaper.data.WallpaperService
 import eu.neuhuber.autowallpaper.data.imageprovider.ImageProvider
 import eu.neuhuber.autowallpaper.model.WallpaperSettings
 import io.mockk.every
@@ -29,7 +29,7 @@ class WallpaperViewModelTest : KoinTest {
 
     private val testDispatcher = StandardTestDispatcher()
     private lateinit var repository: SettingsRepository
-    private lateinit var workManager: WorkManager
+    private lateinit var wallpaperService: WallpaperService
     private lateinit var mockBingProvider: ImageProvider
     private lateinit var viewModel: WallpaperViewModel
 
@@ -38,7 +38,7 @@ class WallpaperViewModelTest : KoinTest {
         Dispatchers.setMain(testDispatcher)
 
         repository = mockk(relaxed = true)
-        workManager = mockk(relaxed = true)
+        wallpaperService = mockk(relaxed = true)
         mockBingProvider = mockk()
 
         every { repository.settingsFlow } returns flowOf(WallpaperSettings(provider = "Bing"))
@@ -49,7 +49,7 @@ class WallpaperViewModelTest : KoinTest {
             })
         }
 
-        viewModel = WallpaperViewModel(repository, workManager)
+        viewModel = WallpaperViewModel(repository, wallpaperService)
     }
 
     @After
