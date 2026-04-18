@@ -2,8 +2,13 @@
 
 [![Android CI/CD](https://github.com/neuos/AutoWallpaper/actions/workflows/android.yml/badge.svg)](https://github.com/neuos/AutoWallpaper/actions/workflows/android.yml)
 
-A modern Android application that automatically updates your wallpaper based on various sources (
-Bing, Picsum) and schedules.
+An Android application that automatically updates your wallpaper.
+
+## Screenshots
+
+|                                                     Main Screen                                                      |                                                               Settings                                                               |
+|:--------------------------------------------------------------------------------------------------------------------:|:------------------------------------------------------------------------------------------------------------------------------------:|
+| ![Main Screen](app/src/test/screenshots/eu.neuhuber.autowallpaper.ui.WallpaperScreenshotTest.snapshotMainScreen.png) | ![Settings Screen](app/src/test/screenshots/eu.neuhuber.autowallpaper.ui.WallpaperScreenshotTest.snapshotMainScreenWithSettings.png) |
 
 ## Features
 

@@ -19,13 +19,6 @@ val appModule = module {
     single<ImageProvider>(named("Bing")) { BingImageProvider }
     single<ImageProvider>(named("Picsum")) { PicsumImageProvider }
 
-    single {
-        mapOf(
-            "Bing" to get<ImageProvider>(named("Bing")),
-            "Picsum" to get<ImageProvider>(named("Picsum"))
-        )
-    }
-
     single { WorkManager.getInstance(get()) }
     viewModelOf(::WallpaperViewModel)
     workerOf(::WallpaperWorker)

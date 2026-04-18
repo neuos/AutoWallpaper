@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.roborazzi)
 }
 
 android {
@@ -31,6 +32,11 @@ android {
             keyPassword = System.getenv("KEY_PASSWORD")
         }
 
+        debug {
+            applicationIdSuffix = ".debug"
+            versionNameSuffix = "-debug"
+        }
+
         release {
             isMinifyEnabled = true
             isShrinkResources = true
@@ -50,11 +56,15 @@ android {
         buildConfig = true
     }
 
-    lint {
-        sarifReport = true
-        abortOnError =
-            false // Allows the pipeline to finish and upload the report even if issues are found
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+        }
     }
+}
+
+roborazzi {
+    outputDir.set(file("src/test/screenshots"))
 }
 
 dependencies {
@@ -79,6 +89,15 @@ dependencies {
     implementation(libs.koin.androidx.workmanager)
     lintChecks(libs.compose.lint.checks)
     testImplementation(libs.junit)
+    testImplementation(libs.mockk)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.koin.test.junit4)
+    testImplementation(libs.roborazzi)
+    testImplementation(libs.roborazzi.compose)
+    testImplementation(libs.roborazzi.junitRule)
+    testImplementation(libs.robolectric)
+    testImplementation(libs.androidx.test.ext.junit.ktx)
+    testImplementation(libs.androidx.compose.ui.test.junit4)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
