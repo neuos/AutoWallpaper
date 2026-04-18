@@ -11,7 +11,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import eu.neuhuber.autowallpaper.data.SettingsRepository
@@ -134,5 +136,22 @@ class WallpaperViewModel(
                 state = state.copy(isUpdateInProgress = false)
             }
         }
+    }
+
+    fun refreshWallpaperImmediately() {
+        Timber.d("Refreshing wallpaper immediately via OneTimeWorkRequest")
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+
+        val workRequest = OneTimeWorkRequestBuilder<WallpaperWorker>()
+            .setConstraints(constraints)
+            .build()
+
+        workManager.enqueueUniqueWork(
+            "ImmediateWallpaperUpdate",
+            ExistingWorkPolicy.REPLACE,
+            workRequest
+        )
     }
 }

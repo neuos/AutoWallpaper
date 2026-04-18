@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Auto Wallpaper</string>
+    <string name="shortcut_refresh_label">Refresh</string>
+    <string name="shortcut_refresh_long_label">Refresh Wallpaper</string>
 </resources>

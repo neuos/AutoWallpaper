@@ -29,6 +29,10 @@ class MainActivity : ComponentActivity() {
             val state = viewModel.state
 
             LaunchedEffect(key1 = true) {
+                if (intent?.action == "eu.neuhuber.autowallpaper.ACTION_REFRESH_WALLPAPER") {
+                    viewModel.refreshWallpaperImmediately()
+                }
+
                 lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                     viewModel.events.collect { event ->
                         when (event) {
