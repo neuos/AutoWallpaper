@@ -32,19 +32,19 @@ sealed class WallpaperUiEvent {
     data class Error(val message: String) : WallpaperUiEvent()
 }
 
+data class WallpaperUiState(
+    val bitmap: ImageBitmap? = null,
+    val settings: WallpaperSettings = WallpaperSettings(),
+    val isUpdateInProgress: Boolean = false
+)
+
 class WallpaperViewModel(
     private val repository: SettingsRepository,
     private val workManager: WorkManager,
     private val providerFactory: ImageProviderFactory
 ) : ViewModel() {
 
-    var bitmap by mutableStateOf<ImageBitmap?>(null)
-        private set
-    
-    var settings by mutableStateOf(WallpaperSettings())
-        private set
-
-    var isUpdateInProgress by mutableStateOf(false)
+    var state by mutableStateOf(WallpaperUiState())
         private set
 
     private val _eventChannel = Channel<WallpaperUiEvent>()
@@ -54,7 +54,7 @@ class WallpaperViewModel(
         viewModelScope.launch {
             repository.settingsFlow.collectLatest {
                 Timber.d("New settings received from repository: $it")
-                settings = it
+                state = state.copy(settings = it)
                 scheduleWallpaperWork()
             }
         }
@@ -67,7 +67,7 @@ class WallpaperViewModel(
     }
 
     private fun scheduleWallpaperWork() {
-        val schedule = settings.schedule
+        val schedule = state.settings.schedule
         if (schedule == ScheduleMode.NONE) {
             Timber.d("Schedule is OFF, canceling any existing work")
             workManager.cancelUniqueWork("DailyWallpaperUpdate")
@@ -94,42 +94,42 @@ class WallpaperViewModel(
     }
 
     fun downloadImage() {
-        if (isUpdateInProgress) return
-        Timber.d("Starting image download from provider: ${settings.provider}")
+        if (state.isUpdateInProgress) return
+        Timber.d("Starting image download from provider: ${state.settings.provider}")
         viewModelScope.launch {
-            isUpdateInProgress = true
+            state = state.copy(isUpdateInProgress = true)
             try {
-                val provider = providerFactory.getProvider(settings.provider)
+                val provider = providerFactory.getProvider(state.settings.provider)
                 val image = provider.getImage()
-                bitmap = image.asImageBitmap()
-                Timber.d("Image downloaded successfully from ${settings.provider} (${image.width}x${image.height} ${image.byteCount / 1_000_000}MB)")
+                state = state.copy(bitmap = image.asImageBitmap())
+                Timber.d("Image downloaded successfully from ${state.settings.provider} (${image.width}x${image.height} ${image.byteCount / 1_000_000}MB)")
             } catch (e: Exception) {
-                Timber.e(e, "Failed to download image from ${settings.provider}")
-                _eventChannel.send(WallpaperUiEvent.Error("Failed to download image from ${settings.provider}"))
+                Timber.e(e, "Failed to download image from ${state.settings.provider}")
+                _eventChannel.send(WallpaperUiEvent.Error("Failed to download image from ${state.settings.provider}"))
             } finally {
-                isUpdateInProgress = false
+                state = state.copy(isUpdateInProgress = false)
             }
         }
     }
 
     fun applyWallpaper(context: Context) {
-        val currentBitmap = bitmap?.asAndroidBitmap()
+        val currentBitmap = state.bitmap?.asAndroidBitmap()
         if (currentBitmap == null) {
             Timber.w("Cannot apply wallpaper: bitmap is null")
             return
         }
         Timber.d("Applying wallpaper")
         viewModelScope.launch {
-            isUpdateInProgress = true
+            state = state.copy(isUpdateInProgress = true)
             try {
-                applyWallpaper(context, currentBitmap, settings)
+                applyWallpaper(context, currentBitmap, state.settings)
                 Timber.d("Wallpaper applied successfully")
                 _eventChannel.send(WallpaperUiEvent.Success)
             } catch (e: Exception) {
                 Timber.e(e, "Error applying wallpaper")
                 _eventChannel.send(WallpaperUiEvent.Error(e.message ?: "Unknown error"))
             } finally {
-                isUpdateInProgress = false
+                state = state.copy(isUpdateInProgress = false)
             }
         }
     }

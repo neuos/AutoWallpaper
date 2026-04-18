@@ -41,6 +41,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             val context = LocalContext.current
             val viewModel: WallpaperViewModel = koinViewModel()
+            val state = viewModel.state
 
             LaunchedEffect(key1 = true) {
                 lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -57,7 +58,7 @@ class MainActivity : ComponentActivity() {
                 }
             }
 
-            AutoWallpaperTheme(imageBitmap = viewModel.bitmap) {
+            AutoWallpaperTheme(imageBitmap = state.bitmap) {
                 var showSettings by remember { mutableStateOf(false) }
                 val sheetState = rememberModalBottomSheetState()
 
@@ -68,7 +69,7 @@ class MainActivity : ComponentActivity() {
                             .fillMaxSize(),
                         contentAlignment = Alignment.BottomCenter
                     ) {
-                        viewModel.bitmap?.let {
+                        state.bitmap?.let {
                             Image(
                                 bitmap = it,
                                 contentDescription = null,
@@ -78,8 +79,8 @@ class MainActivity : ComponentActivity() {
                         }
 
                         ActionButtons(
-                            isLoading = viewModel.isUpdateInProgress,
-                            isSetNowEnabled = viewModel.bitmap != null,
+                            isLoading = state.isUpdateInProgress,
+                            isSetNowEnabled = state.bitmap != null,
                             onDownload = { viewModel.downloadImage() },
                             onSetNow = {
                                 viewModel.applyWallpaper(context)
@@ -93,8 +94,8 @@ class MainActivity : ComponentActivity() {
                                 sheetState = sheetState
                             ) {
                                 SettingsContent(
-                                    settings = viewModel.settings,
-                                    isLoading = viewModel.isUpdateInProgress,
+                                    settings = state.settings,
+                                    isLoading = state.isUpdateInProgress,
                                     onSettingsChange = { viewModel.updateSettings(it) }
                                 )
                             }
