@@ -13,6 +13,7 @@ enum class LockscreenMode(val label: String) {
 
 enum class ScheduleMode(val label: String) {
     NONE("Off"),
+    HOURLY("Hourly"),
     DAILY("Daily")
 }
 

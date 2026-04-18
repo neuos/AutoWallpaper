@@ -67,7 +67,8 @@ class WallpaperViewModel(
     }
 
     private fun scheduleWallpaperWork() {
-        if (settings.schedule == ScheduleMode.NONE) {
+        val schedule = settings.schedule
+        if (schedule == ScheduleMode.NONE) {
             Timber.d("Schedule is OFF, canceling any existing work")
             workManager.cancelUniqueWork("DailyWallpaperUpdate")
             return
@@ -79,8 +80,10 @@ class WallpaperViewModel(
             .setRequiresBatteryNotLow(true)
             .build()
 
-        val repeatingRequest = PeriodicWorkRequestBuilder<WallpaperWorker>(1, TimeUnit.DAYS)
-            .setConstraints(constraints)
+        val repeatingRequest = when (schedule) {
+            ScheduleMode.HOURLY -> PeriodicWorkRequestBuilder<WallpaperWorker>(1, TimeUnit.HOURS)
+            ScheduleMode.DAILY -> PeriodicWorkRequestBuilder<WallpaperWorker>(1, TimeUnit.DAYS)
+        }.setConstraints(constraints)
             .build()
 
         workManager.enqueueUniquePeriodicWork(
