@@ -15,7 +15,7 @@ import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import eu.neuhuber.autowallpaper.data.SettingsRepository
-import eu.neuhuber.autowallpaper.data.imageprovider.ImageProviderFactory
+import eu.neuhuber.autowallpaper.data.imageprovider.ImageProvider
 import eu.neuhuber.autowallpaper.model.ScheduleMode
 import eu.neuhuber.autowallpaper.model.WallpaperSettings
 import eu.neuhuber.autowallpaper.util.applyWallpaper
@@ -24,6 +24,9 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.get
+import org.koin.core.qualifier.named
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
@@ -40,9 +43,8 @@ data class WallpaperUiState(
 
 class WallpaperViewModel(
     private val repository: SettingsRepository,
-    private val workManager: WorkManager,
-    private val providerFactory: ImageProviderFactory
-) : ViewModel() {
+    private val workManager: WorkManager
+) : ViewModel(), KoinComponent {
 
     var state by mutableStateOf(WallpaperUiState())
         private set
@@ -99,7 +101,7 @@ class WallpaperViewModel(
         viewModelScope.launch {
             state = state.copy(isUpdateInProgress = true)
             try {
-                val provider = providerFactory.getProvider(state.settings.provider)
+                val provider = get<ImageProvider>(named(state.settings.provider))
                 val image = provider.getImage()
                 state = state.copy(bitmap = image.asImageBitmap())
                 Timber.d("Image downloaded successfully from ${state.settings.provider} (${image.width}x${image.height} ${image.byteCount / 1_000_000}MB)")
