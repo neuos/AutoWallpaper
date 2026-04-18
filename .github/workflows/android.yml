@@ -9,10 +9,6 @@ on:
 jobs:
   debug:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      security-events: write
-      actions: read # Required for telemetry and run info
     steps:
       - uses: actions/checkout@v4
 
@@ -24,6 +20,8 @@ jobs:
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: wrapper
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
@@ -31,21 +29,17 @@ jobs:
       - name: Build Debug and Lint
         run: ./gradlew :app:assembleDebug :app:lintDebug --no-daemon
 
-      - name: Upload SARIF to GitHub
+      - name: Upload Lint Report
         if: always()
-        uses: github/codeql-action/upload-sarif@v4
+        uses: actions/upload-artifact@v4
         with:
-          sarif_file: app/build/reports/lint-results-debug.sarif
-          category: lint-debug
+          name: lint-report-debug
+          path: app/build/reports/lint-results-debug.html
 
   release:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs: [ debug ]
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      security-events: write
-      actions: read # Required for telemetry and run info
     steps:
       - uses: actions/checkout@v4
         with:
@@ -59,6 +53,8 @@ jobs:
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: wrapper
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
@@ -91,12 +87,12 @@ jobs:
             -PpatchVersion=${{ steps.versioning.outputs.patch }} \
             --no-daemon
 
-      - name: Upload SARIF to GitHub
+      - name: Upload Lint Report
         if: always()
-        uses: github/codeql-action/upload-sarif@v4
+        uses: actions/upload-artifact@v4
         with:
-          sarif_file: app/build/reports/lint-results-release.sarif
-          category: lint-release
+          name: lint-report-release
+          path: app/build/reports/lint-results-release.html
 
       - name: Rename APK
         run: |
