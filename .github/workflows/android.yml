@@ -140,7 +140,7 @@ jobs:
         uses: hidakatsuya/action-report-android-lint@v1
         if: always()
         with:
-          report-path: app/build/reports/lint-results-release.xml
+          result-path: app/build/reports/lint-results-release.xml
 
       - name: Upload Lint Report
         if: always()
