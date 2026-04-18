@@ -49,6 +49,12 @@ android {
         compose = true
         buildConfig = true
     }
+
+    lint {
+        sarifReport = true
+        abortOnError =
+            false // Allows the pipeline to finish and upload the report even if issues are found
+    }
 }
 
 dependencies {
