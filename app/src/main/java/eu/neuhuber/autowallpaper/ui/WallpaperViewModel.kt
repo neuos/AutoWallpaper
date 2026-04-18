@@ -9,28 +9,15 @@ import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.work.Constraints
-import androidx.work.ExistingPeriodicWorkPolicy
-import androidx.work.ExistingWorkPolicy
-import androidx.work.NetworkType
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.PeriodicWorkRequestBuilder
-import androidx.work.WorkManager
 import eu.neuhuber.autowallpaper.data.SettingsRepository
-import eu.neuhuber.autowallpaper.data.imageprovider.ImageProvider
-import eu.neuhuber.autowallpaper.model.ScheduleMode
+import eu.neuhuber.autowallpaper.data.WallpaperService
 import eu.neuhuber.autowallpaper.model.WallpaperSettings
-import eu.neuhuber.autowallpaper.util.applyWallpaper
-import eu.neuhuber.autowallpaper.worker.WallpaperWorker
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
-import org.koin.core.component.get
-import org.koin.core.qualifier.named
 import timber.log.Timber
-import java.util.concurrent.TimeUnit
 
 sealed class WallpaperUiEvent {
     object Success : WallpaperUiEvent()
@@ -45,7 +32,7 @@ data class WallpaperUiState(
 
 class WallpaperViewModel(
     private val repository: SettingsRepository,
-    private val workManager: WorkManager
+    private val wallpaperService: WallpaperService
 ) : ViewModel(), KoinComponent {
 
     var state by mutableStateOf(WallpaperUiState())
@@ -59,7 +46,7 @@ class WallpaperViewModel(
             repository.settingsFlow.collectLatest {
                 Timber.d("New settings received from repository: $it")
                 state = state.copy(settings = it)
-                scheduleWallpaperWork()
+                wallpaperService.scheduleWallpaperWork(it)
             }
         }
     }
@@ -70,41 +57,13 @@ class WallpaperViewModel(
         }
     }
 
-    private fun scheduleWallpaperWork() {
-        val schedule = state.settings.schedule
-        if (schedule == ScheduleMode.NONE) {
-            Timber.d("Schedule is OFF, canceling any existing work")
-            workManager.cancelUniqueWork("DailyWallpaperUpdate")
-            return
-        }
-
-        Timber.d("Scheduling periodic wallpaper work")
-        val constraints = Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED)
-            .setRequiresBatteryNotLow(true)
-            .build()
-
-        val repeatingRequest = when (schedule) {
-            ScheduleMode.HOURLY -> PeriodicWorkRequestBuilder<WallpaperWorker>(1, TimeUnit.HOURS)
-            ScheduleMode.DAILY -> PeriodicWorkRequestBuilder<WallpaperWorker>(1, TimeUnit.DAYS)
-        }.setConstraints(constraints)
-            .build()
-
-        workManager.enqueueUniquePeriodicWork(
-            "DailyWallpaperUpdate",
-            ExistingPeriodicWorkPolicy.UPDATE,
-            repeatingRequest
-        )
-    }
-
     fun downloadImage() {
         if (state.isUpdateInProgress) return
         Timber.d("Starting image download from provider: ${state.settings.provider}")
         viewModelScope.launch {
             state = state.copy(isUpdateInProgress = true)
             try {
-                val provider = get<ImageProvider>(named(state.settings.provider))
-                val image = provider.getImage()
+                val image = wallpaperService.fetchImage()
                 state = state.copy(bitmap = image.asImageBitmap())
                 Timber.d("Image downloaded successfully from ${state.settings.provider} (${image.width}x${image.height} ${image.byteCount / 1_000_000}MB)")
             } catch (e: Exception) {
@@ -126,7 +85,7 @@ class WallpaperViewModel(
         viewModelScope.launch {
             state = state.copy(isUpdateInProgress = true)
             try {
-                applyWallpaper(context, currentBitmap, state.settings)
+                wallpaperService.applyWallpaper(currentBitmap, state.settings)
                 Timber.d("Wallpaper applied successfully")
                 _eventChannel.send(WallpaperUiEvent.Success)
             } catch (e: Exception) {
@@ -136,22 +95,5 @@ class WallpaperViewModel(
                 state = state.copy(isUpdateInProgress = false)
             }
         }
-    }
-
-    fun refreshWallpaperImmediately() {
-        Timber.d("Refreshing wallpaper immediately via OneTimeWorkRequest")
-        val constraints = Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED)
-            .build()
-
-        val workRequest = OneTimeWorkRequestBuilder<WallpaperWorker>()
-            .setConstraints(constraints)
-            .build()
-
-        workManager.enqueueUniqueWork(
-            "ImmediateWallpaperUpdate",
-            ExistingWorkPolicy.REPLACE,
-            workRequest
-        )
     }
 }
