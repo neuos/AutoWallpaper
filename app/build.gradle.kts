@@ -18,18 +18,9 @@ android {
         minSdk = 24
         targetSdk = 37
 
-        versionCode = patchVersion.toInt()
         versionName = "$majorVersion.$minorVersion.$patchVersion"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        setProperty("archivesBaseName", "AutoWallpaper")
-    }
-
-    flavorDimensions += "version"
-    productFlavors {
-        create("standard") {
-            dimension = "version"
-        }
     }
 
     buildTypes {

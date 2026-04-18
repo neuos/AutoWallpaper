@@ -24,7 +24,7 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: Build with Gradle
-        run: ./gradlew assembleDebug
+        run: ./gradlew :app:assembleDebug
 
   lint:
     runs-on: ubuntu-latest
@@ -40,7 +40,7 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: Run Lint
-        run: ./gradlew lintDebug
+        run: ./gradlew :app:lintRelease
 
   release:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
@@ -72,7 +72,7 @@ jobs:
             MINOR_VERSION=$(git rev-list --count ${LAST_MAJOR_CHANGE}..HEAD)
           fi
           
-          # 2. Patch Version: Use GitHub Run Number (always increments on every release attempt)
+          # 2. Patch Version: Use GitHub Run Number
           PATCH_VERSION=${{ github.run_number }}
           
           echo "minor=$MINOR_VERSION" >> $GITHUB_OUTPUT
@@ -88,7 +88,7 @@ jobs:
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |
-          ./gradlew assembleStandardRelease \
+          ./gradlew :app:assembleRelease \
             -PminorVersion=${{ steps.versioning.outputs.minor }} \
             -PpatchVersion=${{ steps.versioning.outputs.patch }}
 
@@ -97,7 +97,7 @@ jobs:
           MAJOR_VERSION=$(grep "val majorVersion =" app/build.gradle.kts | awk -F'=' '{print $2}' | xargs)
           MINOR_VERSION=${{ steps.versioning.outputs.minor }}
           PATCH_VERSION=${{ steps.versioning.outputs.patch }}
-          mv app/build/outputs/apk/standard/release/*.apk "AutoWallpaper ${MAJOR_VERSION}.${MINOR_VERSION}.${PATCH_VERSION}.apk"
+          mv app/build/outputs/apk/release/*.apk "AutoWallpaper ${MAJOR_VERSION}.${MINOR_VERSION}.${PATCH_VERSION}.apk"
 
       - name: Upload Release APK
         uses: actions/upload-artifact@v4
