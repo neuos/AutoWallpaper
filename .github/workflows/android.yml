@@ -12,6 +12,7 @@ jobs:
     permissions:
       contents: read
       security-events: write
+      actions: read # Required for telemetry and run info
     steps:
       - uses: actions/checkout@v4
 
@@ -32,7 +33,7 @@ jobs:
 
       - name: Upload SARIF to GitHub
         if: always()
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: app/build/reports/lint-results-debug.sarif
           category: lint-debug
@@ -44,6 +45,7 @@ jobs:
     permissions:
       contents: read
       security-events: write
+      actions: read # Required for telemetry and run info
     steps:
       - uses: actions/checkout@v4
         with:
@@ -91,7 +93,7 @@ jobs:
 
       - name: Upload SARIF to GitHub
         if: always()
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: app/build/reports/lint-results-release.sarif
           category: lint-release
