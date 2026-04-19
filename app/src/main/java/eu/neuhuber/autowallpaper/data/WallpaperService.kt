@@ -24,6 +24,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import org.koin.core.qualifier.named
 import timber.log.Timber
+import java.util.UUID
 import java.util.concurrent.TimeUnit
 
 class WallpaperService(
@@ -144,7 +145,7 @@ class WallpaperService(
         )
     }
 
-    fun triggerImmediateRefresh() {
+    fun triggerImmediateRefresh(): UUID {
         Timber.d("Triggering immediate wallpaper refresh via OneTimeWorkRequest")
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
@@ -156,9 +157,10 @@ class WallpaperService(
 
         workManager.enqueueUniqueWork(
             "ImmediateWallpaperUpdate",
-            ExistingWorkPolicy.KEEP,
+            ExistingWorkPolicy.REPLACE,
             workRequest
         )
+        return workRequest.id
     }
 
     companion object {

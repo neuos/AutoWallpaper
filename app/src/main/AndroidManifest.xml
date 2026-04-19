@@ -35,15 +35,20 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
 
+        <activity
+            android:name="eu.neuhuber.autowallpaper.RefreshActivity"
+            android:exported="true"
+            android:theme="@style/Theme.App.Transparent"
+            android:noHistory="true"
+            android:excludeFromRecents="true"
+            android:taskAffinity=".refresh"
+            android:launchMode="singleInstance">
             <intent-filter>
                 <action android:name="eu.neuhuber.autowallpaper.ACTION_REFRESH_WALLPAPER" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
-
-            <meta-data
-                android:name="android.app.shortcuts"
-                android:resource="@xml/shortcuts" />
         </activity>
 
     </application>

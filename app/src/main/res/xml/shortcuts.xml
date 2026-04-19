@@ -4,12 +4,13 @@
     <shortcut
         android:enabled="true"
         android:icon="@drawable/ic_refresh"
-        android:shortcutId="refresh_v3"
+        android:shortcutId="refresh_final_v1"
         android:shortcutLongLabel="@string/shortcut_refresh_long_label"
         android:shortcutShortLabel="@string/shortcut_refresh_label"
         tools:targetApi="25">
         <intent
             android:action="eu.neuhuber.autowallpaper.ACTION_REFRESH_WALLPAPER"
-            android:targetClass="eu.neuhuber.autowallpaper.MainActivity" />
+            android:targetClass="eu.neuhuber.autowallpaper.MainActivity"
+            android:targetPackage="@string/app_package" />
     </shortcut>
 </shortcuts>
