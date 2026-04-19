@@ -44,9 +44,9 @@ jobs:
       - name: Build, Test and Lint
         run: |
           if [ "${{ github.event.inputs.update_screenshots }}" == "true" ]; then
-            ./gradlew :app:assembleDebug :app:testDebugUnitTest :app:recordRoborazziDebug :app:lintDebug --no-daemon
+            ./gradlew :app:assembleDebug :app:testDebugUnitTest :app:recordRoborazziDebug :app:lintDebug
           else
-            ./gradlew :app:assembleDebug :app:testDebugUnitTest :app:verifyRoborazziDebug :app:lintDebug --no-daemon
+            ./gradlew :app:assembleDebug :app:testDebugUnitTest :app:verifyRoborazziDebug :app:lintDebug
           fi
 
       - name: Commit Updated Screenshots
@@ -141,8 +141,7 @@ jobs:
         run: |
           ./gradlew :app:lintRelease :app:assembleRelease \
             -PminorVersion=${{ steps.versioning.outputs.minor }} \
-            -PpatchVersion=${{ steps.versioning.outputs.patch }} \
-            --no-daemon
+            -PpatchVersion=${{ steps.versioning.outputs.patch }}
 
       - name: Lint Report
         uses: hidakatsuya/action-report-android-lint@v1
