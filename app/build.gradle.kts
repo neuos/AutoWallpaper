@@ -22,6 +22,7 @@ android {
         versionName = "$majorVersion.$minorVersion.$patchVersion"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        resValue("string", "app_package", "eu.neuhuber.autowallpaper")
     }
 
     buildTypes {
@@ -35,6 +36,7 @@ android {
         debug {
             applicationIdSuffix = ".debug"
             versionNameSuffix = "-debug"
+            resValue("string", "app_package", "eu.neuhuber.autowallpaper.debug")
         }
 
         release {
@@ -54,6 +56,7 @@ android {
     buildFeatures {
         compose = true
         buildConfig = true
+        resValues = true
     }
 
     testOptions {
@@ -69,6 +72,7 @@ roborazzi {
 
 dependencies {
     implementation(libs.androidx.core.splashscreen)
+    implementation(libs.material)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
