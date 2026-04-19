@@ -11,7 +11,7 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -27,7 +27,7 @@ fun MainScreen(
     modifier: Modifier = Modifier,
     initialShowSettings: Boolean = true
 ) {
-    var showSettings by remember { mutableStateOf(initialShowSettings) }
+    var showSettings by rememberSaveable { mutableStateOf(initialShowSettings) }
     val sheetState = rememberModalBottomSheetState()
 
     Scaffold(modifier = modifier.fillMaxSize()) { innerPadding ->
