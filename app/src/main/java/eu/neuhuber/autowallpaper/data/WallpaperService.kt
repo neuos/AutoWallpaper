@@ -156,7 +156,7 @@ class WallpaperService(
 
         workManager.enqueueUniqueWork(
             "ImmediateWallpaperUpdate",
-            ExistingWorkPolicy.REPLACE,
+            ExistingWorkPolicy.KEEP,
             workRequest
         )
     }

@@ -24,8 +24,13 @@ class MainActivity : ComponentActivity() {
 
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
-        installSplashScreen()
         super.onCreate(savedInstanceState)
+        if (intent?.action == ACTION_REFRESH_WALLPAPER) {
+            wallpaperService.triggerImmediateRefresh()
+            finish()
+            return
+        }
+        installSplashScreen()
         enableEdgeToEdge()
         setContent {
             val context = LocalContext.current
@@ -33,10 +38,6 @@ class MainActivity : ComponentActivity() {
             val state = viewModel.state
 
             LaunchedEffect(key1 = true) {
-                if (intent?.action == "eu.neuhuber.autowallpaper.ACTION_REFRESH_WALLPAPER") {
-                    wallpaperService.triggerImmediateRefresh()
-                }
-
                 lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                     viewModel.events.collect { event ->
                         when (event) {
@@ -60,5 +61,9 @@ class MainActivity : ComponentActivity() {
                 )
             }
         }
+    }
+
+    companion object {
+        const val ACTION_REFRESH_WALLPAPER = "eu.neuhuber.autowallpaper.ACTION_REFRESH_WALLPAPER"
     }
 }

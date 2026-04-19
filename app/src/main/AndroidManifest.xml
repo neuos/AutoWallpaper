@@ -28,19 +28,24 @@
         </provider>
 
         <activity
-            android:name=".MainActivity"
+            android:name="eu.neuhuber.autowallpaper.MainActivity"
             android:exported="true"
             android:theme="@style/Theme.App.Starting">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+            <intent-filter>
+                <action android:name="eu.neuhuber.autowallpaper.ACTION_REFRESH_WALLPAPER" />
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
 
             <meta-data
                 android:name="android.app.shortcuts"
                 android:resource="@xml/shortcuts" />
         </activity>
+
     </application>
 
 </manifest>
