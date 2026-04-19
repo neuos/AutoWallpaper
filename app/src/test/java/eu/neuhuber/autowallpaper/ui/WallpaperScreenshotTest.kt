@@ -1,9 +1,9 @@
 package eu.neuhuber.autowallpaper.ui
 
 import android.graphics.BitmapFactory
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -11,6 +11,7 @@ import androidx.compose.ui.test.onRoot
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.takahirom.roborazzi.RoborazziOptions
 import com.github.takahirom.roborazzi.captureRoboImage
+import eu.neuhuber.autowallpaper.model.ScheduleMode
 import eu.neuhuber.autowallpaper.model.WallpaperSettings
 import eu.neuhuber.autowallpaper.ui.theme.AutoWallpaperTheme
 import org.junit.After
@@ -51,7 +52,7 @@ class WallpaperScreenshotTest {
             AutoWallpaperTheme {
                 Surface {
                     SettingsContent(
-                        settings = WallpaperSettings(),
+                        settings = WallpaperSettings(schedule = ScheduleMode.DAILY),
                         isLoading = false,
                         onSettingsChange = {},
                         modifier = Modifier.testTag("settings_content")
@@ -74,7 +75,7 @@ class WallpaperScreenshotTest {
 
         val state = WallpaperUiState(
             bitmap = imageBitmap,
-            settings = WallpaperSettings(),
+            settings = WallpaperSettings(schedule = ScheduleMode.DAILY),
             isUpdateInProgress = false
         )
 
@@ -104,7 +105,7 @@ class WallpaperScreenshotTest {
 
         val state = WallpaperUiState(
             bitmap = imageBitmap,
-            settings = WallpaperSettings(),
+            settings = WallpaperSettings(schedule = ScheduleMode.DAILY),
             isUpdateInProgress = false
         )
 
