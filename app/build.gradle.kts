@@ -22,7 +22,6 @@ android {
         versionName = "$majorVersion.$minorVersion.$patchVersion"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        resValue("string", "app_package", "eu.neuhuber.autowallpaper")
     }
 
     buildTypes {
@@ -36,7 +35,6 @@ android {
         debug {
             applicationIdSuffix = ".debug"
             versionNameSuffix = "-debug"
-            resValue("string", "app_package", "eu.neuhuber.autowallpaper.debug")
         }
 
         release {
