@@ -49,7 +49,7 @@ class MainActivity : ComponentActivity() {
                 MainScreen(
                     state = state,
                     onDownload = { viewModel.downloadImage() },
-                    onApply = { viewModel.applyWallpaper(context) },
+                    onApply = { viewModel.applyWallpaper() },
                     onUpdateSettings = { viewModel.updateSettings(it) }
                 )
             }

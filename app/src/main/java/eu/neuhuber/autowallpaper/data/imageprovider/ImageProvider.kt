@@ -2,23 +2,21 @@ package eu.neuhuber.autowallpaper.data.imageprovider
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import eu.neuhuber.autowallpaper.data.HttpClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import java.net.URL
 
 interface ImageProvider {
-    suspend fun getImage(): Bitmap
+    suspend fun getImage(width: Int, height: Int): Bitmap
 }
 
-suspend fun fetchImage(url: URL): Bitmap = withContext(Dispatchers.IO) {
+suspend fun fetchImage(httpClient: HttpClient, url: String): Bitmap = withContext(Dispatchers.IO) {
+    Timber.d("Starting image download from provider URL: $url")
     try {
-        url.openConnection().apply {
-            connectTimeout = 10_000 // 10 seconds
-            readTimeout = 10_000
-        }.getInputStream().use { response ->
-            BitmapFactory.decodeStream(response)
-                ?: throw Exception("Failed to decode image from $url")
+        httpClient.getStream(url).use { inputStream ->
+            BitmapFactory.decodeStream(inputStream)
+                ?: throw Exception("Failed to decode bitmap from $url")
         }
     } catch (e: Exception) {
         Timber.e(e, "Error fetching image from $url")

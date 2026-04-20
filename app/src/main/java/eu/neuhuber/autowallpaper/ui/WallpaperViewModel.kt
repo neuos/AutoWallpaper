@@ -1,6 +1,5 @@
 package eu.neuhuber.autowallpaper.ui
 
-import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -43,10 +42,19 @@ class WallpaperViewModel(
 
     init {
         viewModelScope.launch {
-            repository.settingsFlow.collectLatest {
-                Timber.d("New settings received from repository: $it")
-                state = state.copy(settings = it)
-                wallpaperService.scheduleWallpaperWork(it)
+            repository.settingsFlow.collectLatest { settings ->
+                Timber.d("New settings received from repository: $settings")
+                val oldSettings = state.settings
+                state = state.copy(settings = settings)
+                wallpaperService.scheduleWallpaperWork(settings)
+
+                // Automatically download image on first load or if provider/homescreen mode changed
+                if (state.bitmap == null ||
+                    oldSettings.provider != settings.provider ||
+                    oldSettings.homescreen != settings.homescreen
+                ) {
+                    downloadImage()
+                }
             }
         }
     }
@@ -75,7 +83,7 @@ class WallpaperViewModel(
         }
     }
 
-    fun applyWallpaper(context: Context) {
+    fun applyWallpaper() {
         val currentBitmap = state.bitmap?.asAndroidBitmap()
         if (currentBitmap == null) {
             Timber.w("Cannot apply wallpaper: bitmap is null")

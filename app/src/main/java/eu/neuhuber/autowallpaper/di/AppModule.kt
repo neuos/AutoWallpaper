@@ -1,6 +1,8 @@
 package eu.neuhuber.autowallpaper.di
 
 import androidx.work.WorkManager
+import eu.neuhuber.autowallpaper.data.DefaultHttpClient
+import eu.neuhuber.autowallpaper.data.HttpClient
 import eu.neuhuber.autowallpaper.data.SettingsRepository
 import eu.neuhuber.autowallpaper.data.WallpaperService
 import eu.neuhuber.autowallpaper.data.imageprovider.BingImageProvider
@@ -17,9 +19,10 @@ import org.koin.dsl.module
 val appModule = module {
     singleOf(::SettingsRepository)
     singleOf(::WallpaperService)
+    single<HttpClient> { DefaultHttpClient() }
 
-    single<ImageProvider>(named("Bing")) { BingImageProvider }
-    single<ImageProvider>(named("Picsum")) { PicsumImageProvider }
+    single<ImageProvider>(named("Bing")) { BingImageProvider(get()) }
+    single<ImageProvider>(named("Picsum")) { PicsumImageProvider(get()) }
 
     single { WorkManager.getInstance(get()) }
     viewModelOf(::WallpaperViewModel)

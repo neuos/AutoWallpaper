@@ -12,6 +12,7 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import eu.neuhuber.autowallpaper.data.imageprovider.ImageProvider
+import eu.neuhuber.autowallpaper.data.imageprovider.PicsumImageProvider
 import eu.neuhuber.autowallpaper.model.HomescreenMode
 import eu.neuhuber.autowallpaper.model.LockscreenMode
 import eu.neuhuber.autowallpaper.model.ScheduleMode
@@ -39,8 +40,11 @@ class WallpaperService(
     suspend fun refreshWallpaper() {
         try {
             val settings = repository.settingsFlow.first()
-            val bitmap = fetchImage()
-            applyWallpaper(bitmap, settings)
+            val provider: ImageProvider = get(named(settings.provider))
+            if (provider is PicsumImageProvider) {
+                provider.resetSeed()
+            }
+            applySettingsInternal(settings, provider, null)
             Timber.d("Wallpaper updated successfully from ${settings.provider}")
         } catch (e: Exception) {
             Timber.e(e, "Error updating wallpaper")
@@ -52,20 +56,70 @@ class WallpaperService(
      * Mid-level: Apply a given bitmap using current settings.
      */
     suspend fun applyWallpaper(bitmap: Bitmap, settings: WallpaperSettings) {
-        val manager = WallpaperManager.getInstance(context)
+        val provider: ImageProvider = get(named(settings.provider))
+        applySettingsInternal(settings, provider, bitmap)
+    }
+
+    private suspend fun applySettingsInternal(
+        settings: WallpaperSettings,
+        provider: ImageProvider,
+        initialBitmap: Bitmap?
+    ) {
+        val metrics = context.resources.displayMetrics
+        val screenWidth = metrics.widthPixels
+        val screenHeight = metrics.heightPixels
+
+        // If we have an initial bitmap and it's portrait, we can use it for anything that needs portrait.
+        // If it's wide, we'll only use it for scrolling home screen.
+        var portraitBitmap: Bitmap? =
+            if (initialBitmap != null && initialBitmap.width <= initialBitmap.height) initialBitmap else null
+
+        // Home screen
         if (settings.homescreen != HomescreenMode.NONE) {
-            val ratio = if (settings.homescreen == HomescreenMode.SCROLLING) {
-                manager.desiredMinimumWidth.toFloat() / manager.desiredMinimumHeight
+            val isScrolling = settings.homescreen == HomescreenMode.SCROLLING
+            val baseWidth = if (isScrolling) screenWidth * 3 else screenWidth
+            val baseHeight = screenHeight
+            val ratio = baseWidth.toFloat() / baseHeight
+
+            val bitmapToUse = if (isScrolling) {
+                if (initialBitmap != null && initialBitmap.width > initialBitmap.height) {
+                    initialBitmap
+                } else {
+                    Timber.d("Fetching wide image for scrolling home screen")
+                    val (fetchWidth, fetchHeight) = getCappedDimensions(
+                        baseWidth * 2,
+                        baseHeight * 2
+                    )
+                    provider.getImage(fetchWidth, fetchHeight)
+                }
             } else {
-                context.resources.displayMetrics.widthPixels.toFloat() / context.resources.displayMetrics.heightPixels
+                val currentPortrait = portraitBitmap ?: run {
+                    Timber.d("Fetching portrait image for home screen")
+                    val (fetchWidth, fetchHeight) = getCappedDimensions(
+                        screenWidth * 2,
+                        screenHeight * 2
+                    )
+                    val newBitmap = provider.getImage(fetchWidth, fetchHeight)
+                    portraitBitmap = newBitmap
+                    newBitmap
+                }
+                currentPortrait
             }
-            setWallpaper(manager, bitmap, WallpaperManager.FLAG_SYSTEM, ratio)
+            setWallpaper(bitmapToUse, WallpaperManager.FLAG_SYSTEM, ratio)
         }
 
+        // Lock screen
         if (settings.lockscreen == LockscreenMode.YES) {
-            val metrics = context.resources.displayMetrics
-            val ratio = metrics.widthPixels.toFloat() / metrics.heightPixels
-            setWallpaper(manager, bitmap, WallpaperManager.FLAG_LOCK, ratio)
+            val currentPortrait = portraitBitmap ?: run {
+                Timber.d("Fetching portrait image for lock screen (requested from server)")
+                val (fetchWidth, fetchHeight) = getCappedDimensions(
+                    screenWidth * 2,
+                    screenHeight * 2
+                )
+                provider.getImage(fetchWidth, fetchHeight)
+            }
+            val ratio = screenWidth.toFloat() / screenHeight
+            setWallpaper(currentPortrait, WallpaperManager.FLAG_LOCK, ratio)
         }
     }
 
@@ -75,13 +129,40 @@ class WallpaperService(
     suspend fun fetchImage(): Bitmap {
         val settings = repository.settingsFlow.first()
         val provider: ImageProvider = get(named(settings.provider))
-        return provider.getImage()
+
+        if (provider is PicsumImageProvider) {
+            provider.resetSeed()
+        }
+
+        val metrics = context.resources.displayMetrics
+        val screenWidth = metrics.widthPixels
+        val screenHeight = metrics.heightPixels
+
+        val isScrolling = settings.homescreen == HomescreenMode.SCROLLING
+        val baseWidth = if (isScrolling) screenWidth * 3 else screenWidth
+        val baseHeight = screenHeight
+
+        val (fetchWidth, fetchHeight) = getCappedDimensions(baseWidth * 2, baseHeight * 2)
+
+        return provider.getImage(fetchWidth, fetchHeight)
+    }
+
+    private fun getCappedDimensions(width: Int, height: Int): Pair<Int, Int> {
+        val maxDim = 4000
+        if (width <= maxDim && height <= maxDim) return width to height
+        val ratio = width.toDouble() / height
+        return if (width > height) {
+            maxDim to (maxDim / ratio).toInt()
+        } else {
+            (maxDim * ratio).toInt() to maxDim
+        }
     }
 
     /**
      * Low-level: Apply bitmap to system.
      */
-    private suspend fun setWallpaper(manager: WallpaperManager, image: Bitmap, which: Int, aspectRatio: Float) {
+    private suspend fun setWallpaper(image: Bitmap, which: Int, aspectRatio: Float) {
+        val manager = WallpaperManager.getInstance(context)
         if (!manager.isSetWallpaperAllowed) {
             Timber.w("Wallpaper set not allowed")
             return
