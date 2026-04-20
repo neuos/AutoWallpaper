@@ -12,8 +12,23 @@ jobs:
       pull-requests: write
       contents: write
     steps:
+      # AUTO_MERGE_TOKEN must be a PAT (or GitHub App token) — NOT GITHUB_TOKEN.
+      # Merges performed with GITHUB_TOKEN do not trigger downstream workflows (e.g. the
+      # Build/Release CI on push to main). Using a PAT causes the merge commit to be
+      # attributed to the token owner and therefore triggers other workflow runs normally.
+      - name: Check AUTO_MERGE_TOKEN is configured
+        run: |
+          if [ -z "$AUTO_MERGE_TOKEN" ]; then
+            echo "::error::AUTO_MERGE_TOKEN secret is not set. Please create a Personal Access Token (PAT) with 'repo' scope and add it as a repository secret named AUTO_MERGE_TOKEN. See the README for details."
+            exit 1
+          fi
+        env:
+          AUTO_MERGE_TOKEN: ${{ secrets.AUTO_MERGE_TOKEN }}
+
       - name: Enable auto-merge for PRs
-        run: gh pr merge --auto --merge "$PR_URL"
+        # --delete-branch removes the head branch once the PR is merged.
+        run: gh pr merge --auto --merge --delete-branch "$PR_URL"
         env:
           PR_URL: ${{ github.event.pull_request.html_url }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Use AUTO_MERGE_TOKEN so the merge commit triggers downstream workflows.
+          GITHUB_TOKEN: ${{ secrets.AUTO_MERGE_TOKEN }}
