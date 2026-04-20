@@ -89,7 +89,7 @@ jobs:
           path: app/build/reports/lint-results-debug.html
 
   release:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
     needs: [ CI ]
     runs-on: ubuntu-latest
     permissions:
