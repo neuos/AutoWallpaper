@@ -1,9 +1,10 @@
-# Auto Wallpaper
-
-[![Android CI/CD](https://img.shields.io/github/actions/workflow/status/neuos/AutoWallpaper/android.yml?branch=main&label=Android%20CI%2FCD)](https://github.com/neuos/AutoWallpaper/actions/workflows/android.yml)
-[![Download APK](https://img.shields.io/github/v/release/neuos/AutoWallpaper?label=Download%20APK&color=green&logo=android&logoColor=white)](https://github.com/neuos/AutoWallpaper/releases/latest)
+# Auto Wallpaper [![Android CI/CD](https://img.shields.io/github/actions/workflow/status/neuos/AutoWallpaper/android.yml?branch=main&label=Android%20CI%2FCD)](https://github.com/neuos/AutoWallpaper/actions/workflows/android.yml)
 
 An Android application that automatically updates your wallpaper.
+
+## Install
+[![Get from Obtanium](https://img.shields.io/badge/Obtainium-Import-blue?logo=obtainium&logoColor=white")](https://apps.obtainium.imranr.dev/redirect.html?r=obtainium://add/https://github.com/neuos/AutoWallpaper)
+[![Download APK](https://img.shields.io/github/v/release/neuos/AutoWallpaper?label=Download%20APK&color=green&logo=android&logoColor=white)](https://github.com/neuos/AutoWallpaper/releases/latest)
 
 ## Features
 
