@@ -1,16 +1,19 @@
 package eu.neuhuber.autowallpaper.data.imageprovider
 
 import android.graphics.Bitmap
-import android.util.Xml
 import eu.neuhuber.autowallpaper.data.HttpClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.xmlpull.v1.XmlPullParser
+import nl.adaptivity.xmlutil.EventType
+import nl.adaptivity.xmlutil.allText
+import nl.adaptivity.xmlutil.xmlStreaming
 import timber.log.Timber
 
 
 class BingImageProvider(private val httpClient: HttpClient) : ImageProvider {
     companion object {
+        private const val BING_API_URL =
+            "https://www.bing.com/HPImageArchive.aspx?format=xml&idx=0&n=1&mkt=de-DE"
         private val resolutions = setOf(
             ResolutionInfo(Dimension(3840, 2160), "UHD"),
             ResolutionInfo(Dimension(1920, 1200), "1920x1200"),
@@ -44,26 +47,20 @@ class BingImageProvider(private val httpClient: HttpClient) : ImageProvider {
     }
 
     private suspend fun fetchUrlPath(): String = withContext(Dispatchers.IO) {
-        val bingApiUrl = "https://www.bing.com/HPImageArchive.aspx?format=xml&idx=0&n=1&mkt=de-DE"
-        Timber.d("Fetching Bing wallpaper metadata from $bingApiUrl")
+        Timber.d("Fetching Bing wallpaper metadata from $BING_API_URL")
         try {
-            httpClient.getStream(bingApiUrl).use { inputStream ->
-                val parser = Xml.newPullParser()
-                parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false)
-                parser.setInput(inputStream, null)
-                var eventType = parser.eventType
-                while (eventType != XmlPullParser.END_DOCUMENT) {
-                    if (eventType == XmlPullParser.START_TAG && parser.name == "urlBase") {
-                        return@withContext parser.nextText()
-                    }
-                    eventType = parser.next()
+            httpClient.getStream(BING_API_URL).use { inputStream ->
+                xmlStreaming.newReader(inputStream.bufferedReader()).use { reader ->
+                    reader.asSequence()
+                        .find { it == EventType.START_ELEMENT && reader.localName == "urlBase" }
+                        ?.let { reader.allText() }
+                        ?: throw Exception("Failed to find urlBase in Bing API response")
                 }
             }
         } catch (e: Exception) {
             Timber.e(e, "Error fetching Bing wallpaper metadata")
             throw e
         }
-        throw Exception("Failed to find urlBase in Bing API response")
     }
 }
 

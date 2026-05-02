@@ -84,6 +84,7 @@ dependencies {
     implementation(libs.material.kolor)
     implementation(libs.androidx.palette)
     implementation(libs.androidx.work.runtime.ktx)
+    implementation(libs.xmlutil.core)
     implementation(libs.timber)
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.koin.android)
