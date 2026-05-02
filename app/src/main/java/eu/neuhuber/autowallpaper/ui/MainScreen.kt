@@ -16,6 +16,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.testTag
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -30,7 +31,9 @@ fun MainScreen(
     var showSettings by rememberSaveable { mutableStateOf(initialShowSettings) }
     val sheetState = rememberModalBottomSheetState()
 
-    Scaffold(modifier = modifier.fillMaxSize()) { innerPadding ->
+    Scaffold(modifier = modifier
+        .fillMaxSize()
+        .testTag("main_screen")) { innerPadding ->
         Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.BottomCenter
@@ -61,7 +64,8 @@ fun MainScreen(
                     SettingsContent(
                         settings = state.settings,
                         isLoading = state.isUpdateInProgress,
-                        onSettingsChange = onUpdateSettings
+                        onSettingsChange = onUpdateSettings,
+                        modifier = Modifier.testTag("settings_content")
                     )
                 }
             }

@@ -78,7 +78,7 @@ class WallpaperService(
         // Home screen
         if (settings.homescreen != HomescreenMode.NONE) {
             val isScrolling = settings.homescreen == HomescreenMode.SCROLLING
-            val baseWidth = if (isScrolling) screenWidth * 3 else screenWidth
+            val baseWidth = if (isScrolling) screenWidth * 2 else screenWidth
             val baseHeight = screenHeight
             val ratio = baseWidth.toFloat() / baseHeight
 

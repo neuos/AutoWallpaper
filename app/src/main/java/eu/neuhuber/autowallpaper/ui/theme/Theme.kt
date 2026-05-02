@@ -8,13 +8,9 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.platform.LocalContext
 import com.materialkolor.rememberDynamicColorScheme
-import eu.neuhuber.autowallpaper.data.WallpaperService
 
 private val DarkColorSchemeFallback = darkColorScheme(
     primary = Purple80,
@@ -30,19 +26,12 @@ private val LightColorSchemeFallback = lightColorScheme(
 
 @Composable
 fun AutoWallpaperTheme(
-    imageBitmap: ImageBitmap? = null,
+    seedColor: Color? = null,
     darkTheme: Boolean = isSystemInDarkTheme(),
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
     val context = LocalContext.current
-
-    val seedColor = remember(imageBitmap) {
-        imageBitmap?.let {
-            val argb = WallpaperService.extractSeedColor(it.asAndroidBitmap())
-            Color(argb)
-        }
-    }
 
     val colorScheme = if (seedColor != null) {
         rememberDynamicColorScheme(
