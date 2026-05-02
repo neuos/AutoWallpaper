@@ -45,6 +45,17 @@ class ResolutionTest {
     }
 
     @Test
+    fun `should not select a pixelated resolution`() {
+        // Even if a low-res image has a slightly better ratio, we should prefer the high-res one
+        // to avoid pixelation on high-res screens.
+        val target = Dimension(4000, 2963) // ~1.35 ratio
+        val localResolutions =
+            resolutions + ResolutionInfo(Dimension(1024, 768), "1024x768") // 1.33 ratio
+        val best = localResolutions.getBestResolution(target)
+        assertEquals("UHD", best)
+    }
+
+    @Test
     fun `should fallback to first if set is empty`() {
         val single = setOf(ResolutionInfo(Dimension(100, 100), "MINI"))
         assertEquals("MINI", single.getBestResolution(Dimension(1000, 1000)))
