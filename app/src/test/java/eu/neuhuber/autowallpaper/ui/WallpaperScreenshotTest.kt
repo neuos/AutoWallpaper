@@ -75,12 +75,13 @@ class WallpaperScreenshotTest {
 
         val state = WallpaperUiState(
             bitmap = imageBitmap,
+            seedColor = null,
             settings = WallpaperSettings(schedule = ScheduleMode.DAILY),
             isUpdateInProgress = false
         )
 
         composeTestRule.setContent {
-            AutoWallpaperTheme(imageBitmap = imageBitmap) {
+            AutoWallpaperTheme(seedColor = state.seedColor) {
                 MainScreen(
                     state = state,
                     onDownload = {},
@@ -105,12 +106,13 @@ class WallpaperScreenshotTest {
 
         val state = WallpaperUiState(
             bitmap = imageBitmap,
+            seedColor = null,
             settings = WallpaperSettings(schedule = ScheduleMode.DAILY),
             isUpdateInProgress = false
         )
 
         composeTestRule.setContent {
-            AutoWallpaperTheme(imageBitmap = imageBitmap) {
+            AutoWallpaperTheme(seedColor = state.seedColor) {
                 MainScreen(
                     state = state,
                     onDownload = {},

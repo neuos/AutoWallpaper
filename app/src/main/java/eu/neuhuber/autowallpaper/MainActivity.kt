@@ -45,7 +45,7 @@ class MainActivity : ComponentActivity() {
                 }
             }
 
-            AutoWallpaperTheme(imageBitmap = state.bitmap) {
+            AutoWallpaperTheme(seedColor = state.seedColor) {
                 MainScreen(
                     state = state,
                     onDownload = { viewModel.downloadImage() },
