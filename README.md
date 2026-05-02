@@ -1,4 +1,4 @@
-# Auto Wallpaper [![Android CI/CD](https://img.shields.io/github/actions/workflow/status/neuos/AutoWallpaper/android.yml?branch=main&label=Android%20CI%2FCD)](https://github.com/neuos/AutoWallpaper/actions/workflows/android.yml)
+# <img src="app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.webp" alt="AutoWallpaper Icon" width="32" height="32"> Auto Wallpaper [![Android CI/CD](https://img.shields.io/github/actions/workflow/status/neuos/AutoWallpaper/android.yml?branch=main&label=Android%20CI%2FCD)](https://github.com/neuos/AutoWallpaper/actions/workflows/android.yml)
 
 An Android application that automatically updates your wallpaper.
 

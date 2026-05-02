@@ -15,10 +15,10 @@
                 android:type="linear">
                 <item
                     android:offset="0"
-                    android:color="#6750A4" /> <!-- HCT Tone 40 Primary -->
+                    android:color="#6444AD" /> <!-- HCT Tone 40 Primary -->
                 <item
                     android:offset="1"
-                    android:color="#006A60" /> <!-- HCT Tone 40 Teal -->
+                    android:color="#06D7C5" /> <!-- HCT Tone 40 Teal -->
             </gradient>
         </aapt:attr>
     </path>
