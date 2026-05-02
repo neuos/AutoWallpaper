@@ -5,7 +5,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onRoot
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -91,6 +92,7 @@ class WallpaperScreenshotTest {
                 )
             }
         }
+        composeTestRule.waitForIdle()
         composeTestRule.onRoot().captureRoboImage(
             roborazziOptions = RoborazziOptions(
                 compareOptions = RoborazziOptions.CompareOptions(changeThreshold = 0.01f)
@@ -122,6 +124,7 @@ class WallpaperScreenshotTest {
                 )
             }
         }
+        composeTestRule.onNodeWithTag("settings_content").assertIsDisplayed()
         composeTestRule.onRoot().captureRoboImage(
             roborazziOptions = RoborazziOptions(
                 compareOptions = RoborazziOptions.CompareOptions(changeThreshold = 0.01f)
