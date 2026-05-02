@@ -7,11 +7,10 @@ import java.util.UUID
 class PicsumImageProvider(private val httpClient: HttpClient) : ImageProvider {
     private var seed: String = UUID.randomUUID().toString()
 
-    override suspend fun getImage(width: Int, height: Int): Bitmap {
+    override suspend fun getImage(dimension: Dimension): Bitmap {
         // Picsum has a maximum dimension of 5000px
-        val cappedWidth = width.coerceIn(1, 5000)
-        val cappedHeight = height.coerceIn(1, 5000)
-        val url = "https://picsum.photos/seed/$seed/$cappedWidth/$cappedHeight"
+        val capped = dimension.coerceIn(1, 5000)
+        val url = "https://picsum.photos/seed/$seed/${capped.width}/${capped.height}"
         return fetchImage(httpClient, url)
     }
 

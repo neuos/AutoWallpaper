@@ -11,6 +11,7 @@ import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
+import eu.neuhuber.autowallpaper.data.imageprovider.Dimension
 import eu.neuhuber.autowallpaper.data.imageprovider.ImageProvider
 import eu.neuhuber.autowallpaper.data.imageprovider.PicsumImageProvider
 import eu.neuhuber.autowallpaper.model.HomescreenMode
@@ -90,7 +91,7 @@ class WallpaperService(
                         baseWidth * 2,
                         baseHeight * 2
                     )
-                    provider.getImage(fetchWidth, fetchHeight)
+                    provider.getImage(Dimension(fetchWidth, fetchHeight))
                 }
             } else {
                 val currentPortrait = portraitBitmap ?: run {
@@ -99,7 +100,7 @@ class WallpaperService(
                         screenWidth * 2,
                         screenHeight * 2
                     )
-                    val newBitmap = provider.getImage(fetchWidth, fetchHeight)
+                    val newBitmap = provider.getImage(Dimension(fetchWidth, fetchHeight))
                     portraitBitmap = newBitmap
                     newBitmap
                 }
@@ -116,7 +117,7 @@ class WallpaperService(
                     screenWidth * 2,
                     screenHeight * 2
                 )
-                provider.getImage(fetchWidth, fetchHeight)
+                provider.getImage(Dimension(fetchWidth, fetchHeight))
             }
             val ratio = screenWidth.toFloat() / screenHeight
             setWallpaper(currentPortrait, WallpaperManager.FLAG_LOCK, ratio)
@@ -144,7 +145,7 @@ class WallpaperService(
 
         val (fetchWidth, fetchHeight) = getCappedDimensions(baseWidth * 2, baseHeight * 2)
 
-        return provider.getImage(fetchWidth, fetchHeight)
+        return provider.getImage(Dimension(fetchWidth, fetchHeight))
     }
 
     private fun getCappedDimensions(width: Int, height: Int): Pair<Int, Int> {
