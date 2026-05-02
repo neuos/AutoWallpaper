@@ -8,7 +8,7 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 interface ImageProvider {
-    suspend fun getImage(width: Int, height: Int): Bitmap
+    suspend fun getImage(dimension: Dimension): Bitmap
 }
 
 suspend fun fetchImage(httpClient: HttpClient, url: String): Bitmap = withContext(Dispatchers.IO) {

@@ -21,10 +21,10 @@ class PicsumImageProviderTest {
         val provider = PicsumImageProvider(httpClient)
 
         runCatching {
-            provider.getImage(100, 200)
+            provider.getImage(Dimension(100, 200))
         }
         runCatching {
-            provider.getImage(300, 400)
+            provider.getImage(Dimension(300, 400))
         }
 
         val seed1 = extractSeed(urlSlot[0])
@@ -34,7 +34,7 @@ class PicsumImageProviderTest {
 
         provider.resetSeed()
         runCatching {
-            provider.getImage(500, 600)
+            provider.getImage(Dimension(500, 600))
         }
 
         val seed3 = extractSeed(urlSlot[2])

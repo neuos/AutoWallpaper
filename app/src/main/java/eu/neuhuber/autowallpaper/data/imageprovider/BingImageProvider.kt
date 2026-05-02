@@ -2,67 +2,65 @@ package eu.neuhuber.autowallpaper.data.imageprovider
 
 import android.graphics.Bitmap
 import eu.neuhuber.autowallpaper.data.HttpClient
-import kotlin.math.min
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import nl.adaptivity.xmlutil.EventType
+import nl.adaptivity.xmlutil.allText
+import nl.adaptivity.xmlutil.xmlStreaming
+import timber.log.Timber
+
 
 class BingImageProvider(private val httpClient: HttpClient) : ImageProvider {
-    private val resolutions = listOf(
-        "UHD",
-        "1920x1200",
-        "1920x1080",
-        "1366x768",
-        "1280x768",
-        "1024x768",
-        "800x600",
-        "800x480",
-        "1080x1920",
-        "768x1280",
-        "720x1280",
-        "640x480",
-        "480x800",
-        "400x240",
-        "320x240",
-        "240x320"
-    )
+    companion object {
+        private const val BING_API_URL =
+            "https://www.bing.com/HPImageArchive.aspx?format=xml&idx=0&n=1&mkt=de-DE"
+        private val resolutions = setOf(
+            ResolutionInfo(Dimension(3840, 2160), "UHD"),
+            ResolutionInfo(Dimension(1920, 1200), "1920x1200"),
+            ResolutionInfo(Dimension(1920, 1080), "1920x1080"),
+            ResolutionInfo(Dimension(1366, 768), "1366x768"),
+            ResolutionInfo(Dimension(1280, 768), "1280x768"),
+            ResolutionInfo(Dimension(1024, 768), "1024x768"),
+            ResolutionInfo(Dimension(800, 600), "800x600"),
+            ResolutionInfo(Dimension(800, 480), "800x480"),
+            ResolutionInfo(Dimension(1080, 1920), "1080x1920"),
+            ResolutionInfo(Dimension(768, 1280), "768x1280"),
+            ResolutionInfo(Dimension(720, 1280), "720x1280"),
+            ResolutionInfo(Dimension(640, 480), "640x480"),
+            ResolutionInfo(Dimension(480, 800), "480x800"),
+            ResolutionInfo(Dimension(400, 240), "400x240"),
+            ResolutionInfo(Dimension(320, 240), "320x240"),
+            ResolutionInfo(Dimension(240, 320), "240x320"),
+        )
+    }
 
-    override suspend fun getImage(width: Int, height: Int): Bitmap {
-        val resolution = findBestResolution(width, height)
-        val url =
-            "https://wallpaper.oracle.neuhuber.eu/?resolution=$resolution&format=image&index=0&mkt=de-DE"
+    private val resolutionCache = mutableMapOf<Dimension, String>()
+
+    override suspend fun getImage(dimension: Dimension): Bitmap {
+        val resolution = resolutionCache.getOrPut(dimension) {
+            resolutions.getBestResolution(dimension)
+        }
+        val urlPath = fetchUrlPath()
+        val urlBase = "https://www.bing.com"
+        val url = "$urlBase${urlPath}_$resolution.jpg"
         return fetchImage(httpClient, url)
     }
 
-    internal fun findBestResolution(targetWidth: Int, targetHeight: Int): String {
-        val targetRatio = targetWidth.toDouble() / targetHeight
-        val targetArea = targetWidth.toDouble() * targetHeight
-
-        val parsedResolutions = resolutions.mapNotNull { res ->
-            val (w, h) = when (res) {
-                "UHD" -> 3840 to 2160
-                else -> {
-                    val parts = res.split("x")
-                    if (parts.size == 2) {
-                        val w = parts[0].toIntOrNull()
-                        val h = parts[1].toIntOrNull()
-                        if (w != null && h != null) w to h else return@mapNotNull null
-                    } else return@mapNotNull null
+    private suspend fun fetchUrlPath(): String = withContext(Dispatchers.IO) {
+        Timber.d("Fetching Bing wallpaper metadata from $BING_API_URL")
+        try {
+            httpClient.getStream(BING_API_URL).use { inputStream ->
+                xmlStreaming.newReader(inputStream.bufferedReader()).use { reader ->
+                    reader.asSequence()
+                        .find { it == EventType.START_ELEMENT && reader.localName == "urlBase" }
+                        ?.let { reader.allText() }
+                        ?: throw Exception("Failed to find urlBase in Bing API response")
                 }
             }
-            ResolutionInfo(w, h, res)
+        } catch (e: Exception) {
+            Timber.e(e, "Error fetching Bing wallpaper metadata")
+            throw e
         }
-
-        // Filter by the area limit to respect "max 2x" target.
-        // We use a buffer (10%) to allow for close matches.
-        val withinLimit = parsedResolutions.filter { it.width * it.height <= targetArea * 1.1 }
-
-        val pool = if (withinLimit.isNotEmpty()) withinLimit else parsedResolutions
-
-        // Pick the one that provides the most "effective" pixels after cropping to the target ratio.
-        return pool.maxBy { res ->
-            val croppedWidth = min(res.width.toDouble(), res.height * targetRatio)
-            val croppedHeight = min(res.height.toDouble(), res.width / targetRatio)
-            croppedWidth * croppedHeight
-        }.name
     }
-
-    private data class ResolutionInfo(val width: Int, val height: Int, val name: String)
 }
+

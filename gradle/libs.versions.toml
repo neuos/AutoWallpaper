@@ -1,5 +1,5 @@
 [versions]
-agp = "9.1.1"
+agp = "9.2.0"
 timber = "5.0.1"
 datastore = "1.2.1"
 koin = "4.2.1"
@@ -11,8 +11,8 @@ lifecycleRuntimeKtx = "2.10.0"
 lifecycleViewmodelCompose = "2.10.0"
 workRuntimeKtx = "2.11.2"
 activityCompose = "1.13.0"
-kotlin = "2.3.20"
-composeBom = "2026.03.01"
+kotlin = "2.3.21"
+composeBom = "2026.04.01"
 composeLintChecks = "1.4.2"
 palette = "1.0.0"
 material = "1.13.0"
@@ -20,8 +20,9 @@ material-kolor = "4.1.1"
 core-splashscreen = "1.2.0"
 mockk = "1.14.9"
 kotlinx-coroutines-test = "1.10.2"
-roborazzi = "1.59.0"
+roborazzi = "1.60.0"
 robolectric = "4.16.1"
+xmlutil = "0.91.3"
 
 [libraries]
 androidx-core-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "core-splashscreen" }
@@ -57,6 +58,7 @@ kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-cor
 roborazzi = { group = "io.github.takahirom.roborazzi", name = "roborazzi", version.ref = "roborazzi" }
 roborazzi-compose = { group = "io.github.takahirom.roborazzi", name = "roborazzi-compose", version.ref = "roborazzi" }
 roborazzi-junitRule = { group = "io.github.takahirom.roborazzi", name = "roborazzi-junit-rule", version.ref = "roborazzi" }
+xmlutil-core = { group = "io.github.pdvrieze.xmlutil", name = "core", version.ref = "xmlutil" }
 robolectric = { group = "org.robolectric", name = "robolectric", version.ref = "robolectric" }
 androidx-test-ext-junit-ktx = { group = "androidx.test.ext", name = "junit-ktx", version.ref = "junitVersion" }
 
